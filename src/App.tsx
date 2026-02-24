@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
@@ -11,83 +11,122 @@ export default function App() {
     const [showLoader, setShowLoader] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
+    const [isMuted, setIsMuted] = useState(true);
+
+    const isAnimatingRef = useRef(false);
+    const lastScrollTimeRef = useRef(0);
+    const activeSectionRef = useRef('hero');
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     const sections = ['hero', 'experience', 'destinations', 'services', 'cta', 'footer'];
 
     useEffect(() => {
+        if (showLoader) return;
+
         const lenis = new Lenis({
-            duration: 1.5,
+            duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            touchMultiplier: 2,
+            touchMultiplier: 1.5,
             infinite: false,
             autoRaf: false,
         });
 
-        let isAnimating = false;
-        let lastScrollTime = 0;
-        const scrollCooldown = 1000; // 1 second cooldown after animation starts
+        const scrollCooldown = 1200;
 
-        const handleWheel = (e: WheelEvent) => {
+        const handleWheel = (e: globalThis.WheelEvent) => {
+            // Unconditionally stop native free-scrolling
             e.preventDefault();
 
-            const now = Date.now();
-            if (isAnimating || showLoader || (now - lastScrollTime < scrollCooldown)) return;
+            // Ignore input if we are currently animating to a section
+            if (isAnimatingRef.current) return;
 
-            // Only trigger if the scroll is significant enough (avoids accidental micro-scrolls)
-            if (Math.abs(e.deltaY) < 10) return;
+            const now = Date.now();
+            // Wait out the animation and any leftover trackpad inertia
+            if (now - lastScrollTimeRef.current < scrollCooldown) return;
+
+            // Require just a 'simple little scroll' to trigger jump
+            if (Math.abs(e.deltaY) < 15) return;
 
             const direction = e.deltaY > 0 ? 1 : -1;
-            const currentIndex = sections.indexOf(activeSection);
-            const nextIndex = Math.max(0, Math.min(sections.length - 1, currentIndex + direction));
+            const currentIndex = sections.indexOf(activeSectionRef.current);
+            let nextIndex = currentIndex + direction;
+
+            // clamp
+            if (nextIndex < 0) nextIndex = 0;
+            if (nextIndex >= sections.length) nextIndex = sections.length - 1;
 
             if (nextIndex !== currentIndex) {
-                isAnimating = true;
-                lastScrollTime = now;
+                isAnimatingRef.current = true;
+                lastScrollTimeRef.current = now;
+
+                setActiveSection(sections[nextIndex]);
+                activeSectionRef.current = sections[nextIndex];
 
                 lenis.scrollTo(`#${sections[nextIndex]}`, {
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    lock: true,
                     onComplete: () => {
-                        // Keep animating flag true for a tiny bit longer to absorb trackpad inertia
+                        // Small delay to prevent trackpad tail-inertia from double-triggering
                         setTimeout(() => {
-                            isAnimating = false;
-                            setActiveSection(sections[nextIndex]);
+                            isAnimatingRef.current = false;
                         }, 200);
                     }
                 });
             }
         };
 
-        window.addEventListener('wheel', handleWheel, { passive: false });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting && !isAnimatingRef.current) {
+                    setActiveSection(entry.target.id);
+                    activeSectionRef.current = entry.target.id;
+                }
+            });
+        }, {
+            threshold: 0.5,
+            rootMargin: "0px"
+        });
+
+        sections.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        const handleScroll = () => {
+            const heroSection = document.getElementById('hero');
+            if (heroSection) {
+                const heroHeight = heroSection.offsetHeight;
+                setIsScrolled(window.scrollY > heroHeight - 100);
+            }
+        };
 
         function raf(time: number) {
             lenis.raf(time);
             requestAnimationFrame(raf);
         }
 
-        requestAnimationFrame(raf);
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('scroll', handleScroll);
+        const rafId = requestAnimationFrame(raf);
 
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('scroll', handleScroll);
+            observer.disconnect();
+            cancelAnimationFrame(rafId);
+            lenis.destroy();
+        };
+    }, [showLoader]);
+
+    useEffect(() => {
         setIsDesktop(window.innerWidth >= 768);
         const handleResize = () => setIsDesktop(window.innerWidth >= 768);
         window.addEventListener('resize', handleResize);
-
-        const handleScroll = () => {
-            const heroSection = document.getElementById('hero');
-            if (heroSection) {
-                const heroBottom = heroSection.offsetHeight;
-                setIsScrolled(window.scrollY > heroBottom - 100);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('wheel', handleWheel);
-            window.removeEventListener('resize', handleResize);
-            window.removeEventListener('scroll', handleScroll);
-            lenis.destroy();
-        };
-    }, [activeSection, showLoader]);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
-        // Hide loader after 3.5 seconds
         const timer = setTimeout(() => {
             setShowLoader(false);
         }, 4700);
@@ -98,12 +137,17 @@ export default function App() {
         <div className="relative">
             {/* Custom Pagination Indicator */}
             <div className="fixed right-8 top-1/2 -translate-y-1/2 z-[150] hidden md:flex flex-col gap-6">
-                {sections.map((id, index) => (
+                {sections.map((id) => (
                     <button
                         key={id}
                         onClick={() => {
                             const element = document.getElementById(id);
-                            if (element) element.scrollIntoView({ behavior: 'smooth' });
+                            if (element) {
+                                isAnimatingRef.current = true;
+                                element.scrollIntoView({ behavior: 'smooth' });
+                                // Reset animating flag after smooth scroll is likely done
+                                setTimeout(() => { isAnimatingRef.current = false; }, 1000);
+                            }
                         }}
                         className="group flex items-center justify-end gap-4"
                     >
@@ -137,7 +181,6 @@ export default function App() {
                     noiseIntensity={3.5}
                     rotation={0}
                 />
-                {/* Black opacity layer */}
                 <div className="absolute inset-0 bg-black/70"></div>
             </div>
 
@@ -159,7 +202,6 @@ export default function App() {
                                 noiseIntensity={3.5}
                                 rotation={0}
                             />
-                            {/* Black opacity layer */}
                             <div className="absolute inset-0 bg-black/70"></div>
                         </motion.div>
                         <motion.img
@@ -210,20 +252,15 @@ export default function App() {
                                 {Array.from("HIMALAYAN").map((char, i) => {
                                     const totalDuration = 4.7;
                                     const typingDelay = 0.3 + (i * 0.08);
-
-                                    // Vaporize starts at 2.7s for the first letter, and subsequent letters follow
                                     const vaporizeStart = 2.7 + (i * 0.08);
                                     const vaporizeEnd = vaporizeStart + 0.8;
-
                                     const t1 = typingDelay / totalDuration;
                                     const t2 = (typingDelay + 0.05) / totalDuration;
                                     const t3 = vaporizeStart / totalDuration;
                                     const t4 = vaporizeEnd / totalDuration;
-
                                     const vaporX = (i % 2 === 0 ? 1 : -1) * (20 + i * 15);
                                     const vaporY = -40 - (i % 3) * 20;
                                     const vaporRotate = (i % 2 === 0 ? 45 : -45) + i * 5;
-
                                     return (
                                         <motion.span
                                             key={`h-${i}`}
@@ -246,21 +283,17 @@ export default function App() {
                             <span className="font-cursive liquid-gold-text text-[48px] lg:text-[76px] font-medium pl-2 pr-2 tracking-wide flex">
                                 {Array.from("Luxe").map((char, i) => {
                                     const totalDuration = 4.7;
-                                    const delayOffset = 0.3 + ("HIMALAYAN".length * 0.08); // Starts after HIMALAYAN
+                                    const delayOffset = 0.3 + ("HIMALAYAN".length * 0.08);
                                     const typingDelay = delayOffset + (i * 0.08);
-
                                     const vaporizeStart = 2.7 + ("HIMALAYAN".length * 0.08) + (i * 0.08);
                                     const vaporizeEnd = vaporizeStart + 0.8;
-
                                     const t1 = typingDelay / totalDuration;
                                     const t2 = (typingDelay + 0.05) / totalDuration;
                                     const t3 = vaporizeStart / totalDuration;
                                     const t4 = vaporizeEnd / totalDuration;
-
                                     const vaporX = (i % 2 === 0 ? 1 : -1) * (30 + i * 20);
                                     const vaporY = -50 - (i % 2) * 20;
                                     const vaporRotate = (i % 2 === 0 ? 60 : -60) - i * 10;
-
                                     return (
                                         <motion.span
                                             key={`l-${i}`}
@@ -325,7 +358,6 @@ export default function App() {
                     }`}
                 onClick={() => setMenuOpen(false)}
             >
-                {/* Silk Background for Menu */}
                 <div className="absolute inset-0">
                     <Silk
                         speed={0.8}
@@ -347,46 +379,19 @@ export default function App() {
 
                 <div className="h-full flex items-center justify-center relative z-10">
                     <nav className="flex flex-col items-center gap-12" onClick={(e) => e.stopPropagation()}>
-                        <motion.a
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            href="#hero"
-                            onClick={() => setMenuOpen(false)}
-                            className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors"
-                        >
-                            Home
-                        </motion.a>
-                        <motion.a
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            href="#experience"
-                            onClick={() => setMenuOpen(false)}
-                            className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors"
-                        >
-                            Experience
-                        </motion.a>
-                        <motion.a
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            href="#destinations"
-                            onClick={() => setMenuOpen(false)}
-                            className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors"
-                        >
-                            Destinations
-                        </motion.a>
-                        <motion.a
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            href="#services"
-                            onClick={() => setMenuOpen(false)}
-                            className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors"
-                        >
-                            Services
-                        </motion.a>
+                        {['home', 'experience', 'destinations', 'services'].map((item, i) => (
+                            <motion.a
+                                key={item}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
+                                href={`#${item === 'home' ? 'hero' : item}`}
+                                onClick={() => setMenuOpen(false)}
+                                className="text-white font-['Playfair_Display'] text-4xl md:text-5xl hover:text-gold transition-colors capitalize"
+                            >
+                                {item}
+                            </motion.a>
+                        ))}
                     </nav>
                 </div>
             </div>
@@ -394,10 +399,52 @@ export default function App() {
             <div className="scroll-wrapper relative z-10">
                 <section className="section-container relative min-h-screen w-full flex items-center justify-center overflow-hidden" id="hero">
                     <div className="absolute inset-0 z-0">
-                        <video autoPlay loop playsInline muted className="w-full h-full object-cover">
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            loop
+                            playsInline
+                            muted={isMuted}
+                            className="w-full h-full object-cover"
+                        >
                             <source src="/Video.mp4" type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/10 to-black/80"></div>
+                    </div>
+
+                    <div className="absolute bottom-12 right-12 z-40">
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 3.5, duration: 1 }}
+                            onClick={() => setIsMuted(!isMuted)}
+                            className="group relative flex items-center justify-center p-4 rounded-full border border-gold/30 bg-black/20 backdrop-blur-md hover:border-gold hover:bg-gold/10 transition-all duration-500 overflow-hidden"
+                            title={isMuted ? "Unmute" : "Mute"}
+                        >
+                            <div className="relative z-10">
+                                {isMuted ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/60 group-hover:text-gold transition-colors duration-500">
+                                        <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                                        <line x1="23" y1="9" x2="17" y2="15"></line>
+                                        <line x1="17" y1="9" x2="23" y2="15"></line>
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
+                                        <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                                    </svg>
+                                )}
+                            </div>
+                            {!isMuted && (
+                                <motion.div
+                                    initial={{ scale: 0, opacity: 0.5 }}
+                                    animate={{ scale: 2, opacity: 0 }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                                    className="absolute inset-0 border border-gold rounded-full"
+                                />
+                            )}
+                        </motion.button>
                     </div>
 
                     <div className="absolute bottom-12 md:bottom-20 w-full px-8 md:px-16 flex flex-col items-start justify-end z-20">
@@ -423,9 +470,7 @@ export default function App() {
                     </div>
                 </section>
 
-                {/* The Experience Section - The Philosophy */}
                 <section className="section-container relative min-h-[100vh] w-full flex items-center justify-center px-4 md:px-12 pt-40 pb-20 mt-32 overflow-hidden" id="experience">
-                    {/* Decorative subtle background element */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
                     <div className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-16 md:gap-12">
@@ -474,7 +519,6 @@ export default function App() {
                     </div>
                 </section>
 
-                {/* Expand on Hover Section */}
                 <section className="section-container relative h-screen w-full flex flex-col items-start justify-center px-8 md:px-12 pt-24" id="destinations">
                     <div className="w-full flex flex-col items-start">
                         <div className="w-full flex items-center justify-between mb-4">
@@ -525,7 +569,6 @@ export default function App() {
                     </div>
                 </section>
 
-                {/* Services Section - The Offerings */}
                 <section className="section-container relative min-h-[100vh] w-full flex flex-col py-32 px-8 md:px-12" id="services">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -541,66 +584,33 @@ export default function App() {
                     </motion.div>
 
                     <div className="w-full max-w-[1300px] mx-auto flex flex-col border-t border-white/10">
-                        {/* Service Item 1 */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ margin: "-50px", amount: 0.3 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-                            className="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-12 md:py-16 border-b border-white/10 hover:border-gold/50 transition-colors duration-700 cursor-pointer"
-                        >
-                            <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
-                                <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">01</span>
-                                <h3 className="font-serif text-[32px] md:text-[48px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
-                                    Grand Nuptials
-                                </h3>
-                            </div>
-                            <p className="text-white/40 text-sm md:text-base max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
-                                A symphony of scale and intimacy. Palatial transformations executed with microscopic precision.
-                            </p>
-                        </motion.div>
-
-                        {/* Service Item 2 */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ margin: "-50px", amount: 0.3 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                            className="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-12 md:py-16 border-b border-white/10 hover:border-gold/50 transition-colors duration-700 cursor-pointer"
-                        >
-                            <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
-                                <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">02</span>
-                                <h3 className="font-serif text-[32px] md:text-[48px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
-                                    Royal Escapes
-                                </h3>
-                            </div>
-                            <p className="text-white/40 text-sm md:text-base max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
-                                Destination events that redefine the locale. We don't just find venues; we sculpt worlds.
-                            </p>
-                        </motion.div>
-
-                        {/* Service Item 3 */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ margin: "-50px", amount: 0.3 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                            className="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-12 md:py-16 border-b border-white/10 hover:border-gold/50 transition-colors duration-700 cursor-pointer"
-                        >
-                            <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
-                                <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">03</span>
-                                <h3 className="font-serif text-[32px] md:text-[48px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
-                                    Haute Couture Decor
-                                </h3>
-                            </div>
-                            <p className="text-white/40 text-sm md:text-base max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
-                                Floral architecture and spatial design curated by internationally acclaimed artists.
-                            </p>
-                        </motion.div>
+                        {[
+                            { id: '01', title: 'Grand Nuptials', desc: 'A symphony of scale and intimacy. Palatial transformations executed with microscopic precision.' },
+                            { id: '02', title: 'Royal Escapes', desc: "Destination events that redefine the locale. We don't just find venues; we sculpt worlds." },
+                            { id: '03', title: 'Haute Couture Decor', desc: 'Floral architecture and spatial design curated by internationally acclaimed artists.' }
+                        ].map((service, i) => (
+                            <motion.div
+                                key={service.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ margin: "-50px", amount: 0.3 }}
+                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 * (i + 1) }}
+                                className="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-12 md:py-16 border-b border-white/10 hover:border-gold/50 transition-colors duration-700 cursor-pointer"
+                            >
+                                <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
+                                    <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">{service.id}</span>
+                                    <h3 className="font-serif text-[32px] md:text-[48px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
+                                        {service.title}
+                                    </h3>
+                                </div>
+                                <p className="text-white/40 text-sm md:text-base max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
+                                    {service.desc}
+                                </p>
+                            </motion.div>
+                        ))}
                     </div>
                 </section>
 
-                {/* CTA Section - The Call to Legacy */}
                 <section className="section-container relative min-h-[100vh] w-full flex items-center justify-center px-8 md:px-12 overflow-hidden" id="cta">
                     <div className="absolute inset-0 bg-gold/5 pointer-events-none"></div>
                     <motion.div
@@ -625,7 +635,6 @@ export default function App() {
                     </motion.div>
                 </section>
 
-                {/* Footer Section */}
                 <section className="section-container relative min-h-[60vh] w-full flex flex-col items-center justify-between px-8 md:px-24 py-24 bg-black/40" id="footer">
                     <div className="w-full max-w-[1400px] flex flex-col md:flex-row items-start justify-between gap-24 md:gap-12">
                         <div className="flex flex-col items-start max-w-md">
@@ -646,25 +655,19 @@ export default function App() {
                             <div className="flex flex-col gap-6">
                                 <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Discover</span>
                                 {['About', 'Gallery', 'Venues', 'Process'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">
-                                        {link}
-                                    </a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                             <div className="flex flex-col gap-6">
                                 <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Explore</span>
                                 {['Destinations', 'Services', 'Artistry', 'Awards'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">
-                                        {link}
-                                    </a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                             <div className="flex flex-col gap-6">
                                 <span className="text-gold text-[10px] tracking-[0.3em] uppercase font-medium mb-2">Legal</span>
                                 {['Privacy', 'Terms', 'Concierge'].map((link) => (
-                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">
-                                        {link}
-                                    </a>
+                                    <a key={link} href="#" className="text-white/40 hover:text-white transition-colors text-sm font-sans tracking-wide">{link}</a>
                                 ))}
                             </div>
                         </div>
@@ -680,7 +683,6 @@ export default function App() {
                         </div>
                     </div>
                 </section>
-
             </div>
         </div>
     );

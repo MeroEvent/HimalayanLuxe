@@ -4,8 +4,7 @@
 
 @layer base {
     html {
-        scroll-snap-type: y mandatory;
-        scroll-behavior: smooth;
+        overflow-x: hidden;
     }
 
     html,
@@ -35,8 +34,6 @@
 @layer components {
     .section-container {
         @apply min-h-screen w-full relative overflow-hidden flex items-center justify-center;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
     }
 
     .grainy-texture::before {
