@@ -62,7 +62,7 @@ const Skiper52 = () => {
   ];
 
   return (
-    <div className="flex h-full w-full items-center justify-start overflow-hidden bg-transparent">
+    <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
       <HoverExpand_001 className="" images={images} />
     </div>
   );
@@ -97,68 +97,77 @@ const HoverExpand_001 = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-full"
+        className="w-full overflow-x-auto scrollbar-hide"
       >
-        <div className="flex w-full items-center justify-start gap-3">
-          {images.map((image, index) => (
-            <motion.div
-              key={index}
-              className="relative cursor-pointer overflow-hidden rounded-3xl border-2 border-gold/30 hover:border-gold/60 flex-shrink"
-              style={{ willChange: 'transform, opacity, width' }}
-              initial={{ opacity: 0, x: 200 }}
-              animate={hasAnimated ? { 
-                opacity: 1, 
-                x: 0, 
-                width: activeImage === index ? "32rem" : "8rem", 
-                height: "32rem" 
-              } : { 
-                opacity: 0, 
-                x: 200, 
-                width: "8rem", 
-                height: "32rem" 
-              }}
-              transition={{ 
-                opacity: { duration: 1, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
-                x: { duration: 1.2, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
-                width: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-              }}
-              onClick={() => setActiveImage(index)}
-              onHoverStart={() => setActiveImage(index)}
-            >
-              <AnimatePresence>
-                {activeImage === index && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent"
-                  />
-                )}
-              </AnimatePresence>
+        <div className="flex w-max lg:w-full items-center justify-start gap-2 md:gap-3 py-4 lg:py-8">
+          {images.map((image, index) => {
+            const isWindowDefined = typeof window !== 'undefined';
+            const isMobile = isWindowDefined && window.innerWidth < 1024;
 
-              <AnimatePresence>
-                {activeImage === index && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute flex h-full w-full flex-col items-end justify-end p-4"
-                  >
-                    <p className="text-left text-xs text-gold/80 font-medium tracking-wider">
-                      {image.code}
-                    </p>
-                  </motion.div>
+            return (
+              <motion.div
+                key={index}
+                className={cn(
+                  "relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl border border-gold/30 hover:border-gold/60 flex-shrink-0"
                 )}
-              </AnimatePresence>
+                style={{ willChange: 'transform, opacity, width' }}
+                initial={{ opacity: 0, x: 200 }}
+                animate={hasAnimated ? {
+                  opacity: 1,
+                  x: 0,
+                  width: activeImage === index
+                    ? (isMobile ? "12rem" : "24rem")
+                    : (isMobile ? "4rem" : "6rem"),
+                  height: isMobile ? "15rem" : "24rem"
+                } : {
+                  opacity: 0,
+                  x: 200,
+                  width: isMobile ? "4rem" : "6rem",
+                  height: isMobile ? "15rem" : "24rem"
+                }}
+                transition={{
+                  opacity: { duration: 1, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
+                  x: { duration: 1.2, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] },
+                  width: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+                  height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+                }}
+                onClick={() => setActiveImage(index)}
+                onPointerEnter={() => setActiveImage(index)}
+              >
+                <AnimatePresence>
+                  {activeImage === index && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent"
+                    />
+                  )}
+                </AnimatePresence>
 
-              <img
-                src={image.src}
-                className="size-full object-cover"
-                alt={image.alt}
-              />
-            </motion.div>
-          ))}
+                <AnimatePresence>
+                  {activeImage === index && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute flex h-full w-full flex-col items-end justify-end p-4"
+                    >
+                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider">
+                        {image.code}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <img
+                  src={image.src}
+                  className="size-full object-cover"
+                  alt={image.alt}
+                />
+              </motion.div>
+            );
+          })}
         </div>
       </motion.div>
     </motion.div>
