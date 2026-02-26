@@ -17,6 +17,15 @@ export default function App() {
     const [activeSection, setActiveSection] = useState('hero');
     const [isMuted, setIsMuted] = useState(true);
     const [activePhilosophy, setActivePhilosophy] = useState(0);
+    const [showActiveLabel, setShowActiveLabel] = useState(true);
+
+    useEffect(() => {
+        setShowActiveLabel(true);
+        const timer = setTimeout(() => {
+            setShowActiveLabel(false);
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [activeSection]);
 
     const isAnimatingRef = useRef(false);
     const lastScrollTimeRef = useRef(0);
@@ -283,7 +292,9 @@ export default function App() {
                         }}
                         className="group flex items-center justify-end gap-4"
                     >
-                        <span className={`text-[10px] tracking-[0.2em] uppercase font-medium transition-all duration-500 ${activeSection === id ? 'opacity-100 translate-x-0 text-gold' : 'opacity-0 translate-x-4 text-white hover:opacity-50'
+                        <span className={`text-[10px] tracking-[0.2em] uppercase font-medium transition-all duration-500 ${activeSection === id
+                            ? (showActiveLabel ? 'opacity-100 translate-x-0 text-gold' : 'opacity-0 translate-x-4 text-gold group-hover:opacity-100 group-hover:translate-x-0')
+                            : 'opacity-0 translate-x-4 text-white group-hover:opacity-50 group-hover:translate-x-0'
                             }`}>
                             {id}
                         </span>
