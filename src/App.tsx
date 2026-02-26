@@ -162,6 +162,43 @@ export default function App() {
                 }
             }
 
+            // Handle internal services scrolling for the stacked cards
+            if (activeSectionRef.current === 'services') {
+                const servicesEl = document.getElementById('services');
+                if (servicesEl) {
+                    const rect = servicesEl.getBoundingClientRect();
+                    const scrollAmount = window.innerHeight * (window.innerWidth >= 768 ? 1.0 : 0.8);
+
+                    if (direction > 0 && rect.bottom > window.innerHeight + 50) {
+                        // Scrolling down inside services
+                        isAnimatingRef.current = true;
+                        lastScrollTimeRef.current = Date.now();
+                        lenis.scrollTo(window.scrollY + scrollAmount, {
+                            duration: 1.0,
+                            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                            lock: true,
+                            onComplete: () => {
+                                setTimeout(() => { isAnimatingRef.current = false; }, 100);
+                            }
+                        });
+                        return;
+                    } else if (direction < 0 && rect.top < -50) {
+                        // Scrolling up inside services
+                        isAnimatingRef.current = true;
+                        lastScrollTimeRef.current = Date.now();
+                        lenis.scrollTo(window.scrollY - scrollAmount, {
+                            duration: 1.0,
+                            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                            lock: true,
+                            onComplete: () => {
+                                setTimeout(() => { isAnimatingRef.current = false; }, 100);
+                            }
+                        });
+                        return;
+                    }
+                }
+            }
+
             let nextIndex = currentIndex + direction;
 
             if (nextIndex < 0) nextIndex = 0;
@@ -186,7 +223,16 @@ export default function App() {
                     }
                 }
 
-                lenis.scrollTo(`#${nextSectionId}`, {
+                // If scrolling UP to services, go to the bottom of the section instead of the top
+                let targetPos: string | number = `#${nextSectionId}`;
+                if (nextSectionId === 'services' && direction < 0) {
+                    const servicesEl = document.getElementById('services');
+                    if (servicesEl) {
+                        targetPos = window.scrollY + servicesEl.getBoundingClientRect().bottom - window.innerHeight;
+                    }
+                }
+
+                lenis.scrollTo(targetPos, {
                     duration: 1.2,
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                     lock: true,
@@ -572,13 +618,13 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative min-h-[100dvh] w-full flex flex-col justify-center py-24 px-8 md:px-12" id="services">
+                <section className="relative w-full pt-32 pb-32 px-4 md:px-8" id="services">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ margin: "-100px", amount: 0.3 }}
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="mb-24 flex flex-col items-center text-center"
+                        className="mb-16 flex flex-col items-center text-center"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
                         <h2 className="font-serif text-white/95 text-[clamp(24px,3.5vw,44px)] font-normal leading-tight">
@@ -586,30 +632,37 @@ export default function App() {
                         </h2>
                     </motion.div>
 
-                    <div className="w-full max-w-[1300px] mx-auto flex flex-col border-t border-white/10">
+                    <div className="w-full max-w-[1400px] mx-auto flex flex-col gap-[80vh] md:gap-[100vh] pb-[80vh] relative z-10">
                         {[
-                            { id: '01', title: 'Grand Nuptials', desc: 'A symphony of scale and intimacy. Palatial transformations executed with microscopic precision.' },
-                            { id: '02', title: 'Royal Escapes', desc: "Destination events that redefine the locale. We don't just find venues; we sculpt worlds." },
-                            { id: '03', title: 'Haute Couture Decor', desc: 'Floral architecture and spatial design curated by internationally acclaimed artists.' }
+                            { id: '01', title: 'Grand Nuptials', subtitle: "US VOGUE'S 'ULTIMATE WEDDING PLANNER MASTER LIST'", desc: 'Palatial transformations executed with microscopic precision.', img: '/experience_image.png' },
+                            { id: '02', title: 'Royal Escapes', subtitle: 'Destination events redefined', desc: "We don't just find venues; we sculpt worlds seamlessly blending nature and luxury.", img: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1600&q=80' },
+                            { id: '03', title: 'Haute Couture Decor', subtitle: 'Breathing ecosystems of art', desc: 'Floral architecture and spatial design curated by internationally acclaimed artists.', img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&q=80' },
+                            { id: '04', title: 'Sensory Entertainment', subtitle: 'Journeys through sound', desc: 'From global icons to intimate serenades. We curate journeys through sound and performance.', img: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=1600&q=80' }
                         ].map((service, i) => (
-                            <motion.div
+                            <div
                                 key={service.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ margin: "-50px", amount: 0.3 }}
-                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 * (i + 1) }}
-                                className="group relative flex flex-col md:flex-row items-start md:items-center justify-between py-12 md:py-16 border-b border-white/10 hover:border-gold/50 transition-colors duration-700 cursor-pointer"
+                                className="sticky flex flex-col items-center justify-center w-full h-[70vh] md:h-[80vh] rounded-[24px] md:rounded-[40px] overflow-hidden shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border border-white/10"
+                                style={{ top: `calc(10vh + ${i * 24}px)` }}
                             >
-                                <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
-                                    <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">{service.id}</span>
-                                    <h3 className="font-serif text-[clamp(20px,2vw,32px)] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
+                                <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                                <motion.div
+                                    initial={{ opacity: 0, y: 50 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ amount: 0.4 }}
+                                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                                    className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl w-full"
+                                >
+                                    <h3 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[1.1] mb-6 drop-shadow-2xl">
                                         {service.title}
                                     </h3>
-                                </div>
-                                <p className="text-white/40 text-[12px] md:text-[13px] max-w-sm leading-relaxed md:text-right group-hover:text-white/70 transition-colors duration-700">
-                                    {service.desc}
-                                </p>
-                            </motion.div>
+                                    <h4 className="text-white/80 font-sans tracking-[0.15em] md:tracking-[0.2em] text-[clamp(10px,1.2vw,14px)] font-semibold uppercase drop-shadow-lg">
+                                        {service.subtitle}
+                                    </h4>
+                                </motion.div>
+                            </div>
                         ))}
                     </div>
                 </section>
