@@ -23,10 +23,21 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
                 />
             </div>
 
-            <div className="absolute top-10 right-8 md:right-12 z-10">
+            <div className="absolute top-10 left-8 md:left-12 z-10">
+                <motion.img
+                    src="/LOGO.svg"
+                    alt="Himalayan Luxe"
+                    className="h-16 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: menuOpen ? 1 : 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                />
+            </div>
+
+            <div className="absolute top-10 right-8 md:right-12 z-10 flex items-center h-16">
                 <button
                     onClick={() => setMenuOpen(false)}
-                    className="text-white hover:opacity-70 transition-opacity text-5xl font-light leading-none"
+                    className="text-white hover:text-gold transition-colors duration-500 text-5xl font-light leading-none"
                 >
                     ×
                 </button>

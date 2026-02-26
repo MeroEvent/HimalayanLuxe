@@ -287,13 +287,13 @@ export default function App() {
                             }`}>
                             {id}
                         </span>
-                        <div className="relative flex items-center justify-center">
-                            <div className={`w-1 h-1 rounded-full transition-all duration-500 ${activeSection === id ? 'bg-gold scale-[2.5]' : 'bg-white/30 group-hover:bg-white/60'
+                        <div className="relative flex items-center justify-center w-6 h-6">
+                            <div className={`absolute inset-0 m-auto w-1.5 h-1.5 rounded-full transition-all duration-500 ${activeSection === id ? 'bg-gold scale-[1.5]' : 'bg-white/30 group-hover:bg-white/60'
                                 }`}></div>
                             {activeSection === id && (
                                 <motion.div
                                     layoutId="active-dot"
-                                    className="absolute w-4 h-4 border border-gold rounded-full"
+                                    className="absolute inset-0 m-auto w-5 h-5 border border-gold rounded-full"
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ duration: 0.5 }}
@@ -325,7 +325,7 @@ export default function App() {
             <NavigationOverlay menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
             <div className="scroll-wrapper relative z-10">
-                <section className="section-container relative min-h-screen w-full flex items-center justify-center overflow-hidden" id="hero">
+                <section className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden" id="hero">
                     <div className="absolute inset-0 z-0">
                         <video
                             ref={videoRef}
@@ -340,7 +340,7 @@ export default function App() {
                         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/10 to-black/80"></div>
                     </div>
 
-                    <div className="absolute bottom-12 right-12 z-40">
+                    <div className="absolute bottom-[clamp(1.5rem,5vh,3rem)] right-[clamp(1.5rem,4vw,3rem)] z-40">
                         <motion.button
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -375,32 +375,32 @@ export default function App() {
                         </motion.button>
                     </div>
 
-                    <div className="absolute bottom-10 md:bottom-12 w-full px-8 md:px-16 flex flex-col items-start justify-end z-20">
+                    <div className="absolute bottom-[clamp(1.5rem,5vh,3rem)] w-full px-[clamp(1.5rem,4vw,4rem)] flex flex-col items-start justify-end z-20">
                         <motion.h2
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ amount: 0.3 }}
                             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                            className="font-serif text-white/95 text-[32px] md:text-[48px] lg:text-[64px] font-normal leading-[1.1] max-w-6xl tracking-tight drop-shadow-2xl"
+                            className="font-serif text-white/95 text-[clamp(24px,4vw,64px)] font-normal leading-[1.1] max-w-[80vw] md:max-w-4xl tracking-tight drop-shadow-2xl"
                         >
                             <motion.span
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ amount: 0.3 }}
                                 transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                                className="block mb-0 pr-12 pb-2 overflow-visible"
+                                className="block mb-0 md:mb-2 pr-12 pb-2 overflow-visible"
                             >
-                                <span className="liquid-gold-text text-[18px] md:text-[24px] lg:text-[28px] tracking-[0.1em] font-meno uppercase">Himalayan</span>
-                                <span className="font-cursive liquid-gold-text text-[36px] md:text-[48px] lg:text-[56px] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
+                                <span className="liquid-gold-text text-[clamp(14px,1.5vw,28px)] tracking-[0.1em] font-meno uppercase">Himalayan</span>
+                                <span className="font-cursive liquid-gold-text text-[clamp(28px,3.5vw,56px)] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
                             </motion.span>
                             the most sought after nuptial artist in the world
                         </motion.h2>
                     </div>
                 </section>
 
-                <section className="section-container relative h-screen w-full flex flex-col px-8 md:px-24 overflow-hidden" id="experience">
+                <section className="section-container relative min-h-[100dvh] py-12 md:py-24 w-full flex flex-col px-8 md:px-24 overflow-hidden" id="experience">
                     <div className="h-24 md:h-32 w-full flex-shrink-0"></div> {/* Nav Bar Spacer */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
                     <div className="relative z-10 w-full max-w-[1200px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-between gap-8 md:gap-8 pb-12">
                         <div className="md:w-1/2 flex flex-col items-start text-left">
@@ -416,10 +416,10 @@ export default function App() {
                                     <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium mb-8 block">
                                         {philosophies[activePhilosophy].title}
                                     </span>
-                                    <h2 className="font-serif text-white/95 text-[28px] md:text-[36px] lg:text-[48px] leading-[1.1] font-normal tracking-tight mb-8 max-w-xl">
+                                    <h2 className="font-serif text-white/95 text-[clamp(24px,3vw,48px)] leading-[1.1] font-normal tracking-tight mb-[clamp(1rem,3vh,2rem)] max-w-xl">
                                         {philosophies[activePhilosophy].heading}
                                     </h2>
-                                    <p className="text-white/50 font-sans max-w-lg text-[12px] md:text-[13px] leading-[1.6] tracking-wide mb-10">
+                                    <p className="text-white/50 font-sans max-w-lg text-[clamp(12px,1vw,14px)] leading-[1.6] tracking-wide mb-[clamp(1.5rem,4vh,2.5rem)]">
                                         {philosophies[activePhilosophy].description}
                                     </p>
                                 </motion.div>
@@ -478,7 +478,7 @@ export default function App() {
                             </div>
                         </div>
 
-                        <div className="md:w-1/2 relative h-[300px] md:h-[50vh] w-full max-w-2xl glass-card rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0">
+                        <div className="md:w-1/2 relative h-[clamp(300px,50vh,600px)] w-full max-w-2xl glass-card rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0">
                             <div className="relative w-full h-full rounded-[30px] overflow-hidden">
                                 <AnimatePresence mode="wait">
                                     <motion.img
@@ -511,7 +511,7 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative h-screen w-full flex flex-col items-center justify-center px-8 md:px-12 pt-24" id="destinations">
+                <section className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center py-20 px-8 md:px-12" id="destinations">
                     <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
                         <div className="w-full flex items-center justify-center mb-4 relative">
                             <motion.div
@@ -546,7 +546,7 @@ export default function App() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ margin: "-100px", amount: 0.3 }}
                             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                            className="font-serif text-white/95 text-[24px] md:text-[36px] lg:text-[48px] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
+                            className="font-serif text-white/95 text-[clamp(24px,3.5vw,48px)] font-normal leading-[1.1] tracking-tight drop-shadow-2xl mb-10 text-center"
                         >
                             Crafting timeless <span className="liquid-gold-text">moments</span>
                         </motion.h2>
@@ -561,7 +561,7 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative h-screen w-full flex flex-col py-20 px-8 md:px-12" id="services">
+                <section className="section-container relative min-h-[100dvh] w-full flex flex-col justify-center py-24 px-8 md:px-12" id="services">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -570,7 +570,7 @@ export default function App() {
                         className="mb-24 flex flex-col items-center text-center"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
-                        <h2 className="font-serif text-white/95 text-[24px] md:text-[36px] lg:text-[44px] font-normal leading-tight">
+                        <h2 className="font-serif text-white/95 text-[clamp(24px,3.5vw,44px)] font-normal leading-tight">
                             Curated <span className="italic text-white/50">Excellence</span>
                         </h2>
                     </motion.div>
@@ -591,7 +591,7 @@ export default function App() {
                             >
                                 <div className="flex items-center gap-8 md:gap-16 mb-6 md:mb-0">
                                     <span className="text-gold/40 text-sm font-light tracking-[0.2em] group-hover:text-gold transition-colors duration-700">{service.id}</span>
-                                    <h3 className="font-serif text-[20px] md:text-[32px] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
+                                    <h3 className="font-serif text-[clamp(20px,2vw,32px)] text-white/70 group-hover:text-white transition-all duration-700 group-hover:translate-x-4">
                                         {service.title}
                                     </h3>
                                 </div>
@@ -603,7 +603,7 @@ export default function App() {
                     </div>
                 </section>
 
-                <section className="section-container relative h-screen w-full flex items-center justify-center px-8 md:px-12 overflow-hidden" id="cta">
+                <section className="section-container relative min-h-[100dvh] w-full flex items-center justify-center py-24 px-8 md:px-12 overflow-hidden" id="cta">
                     <div className="absolute inset-0 bg-gold/5 pointer-events-none"></div>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -613,7 +613,7 @@ export default function App() {
                         className="glass-card max-w-4xl w-full p-8 md:p-16 rounded-[30px] md:rounded-[40px] text-center relative z-10"
                     >
                         <span className="liquid-gold-text text-xs tracking-[0.5em] uppercase font-medium mb-12 block">Begin Your Legacy</span>
-                        <h2 className="font-serif text-white/95 text-[32px] md:text-[54px] lg:text-[72px] leading-[0.9] font-normal tracking-tight mb-10">
+                        <h2 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[0.9] font-normal tracking-tight mb-[clamp(1.5rem,4vh,2.5rem)]">
                             Shall we <br /> <span className="italic text-white/40">begin?</span>
                         </h2>
                         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
