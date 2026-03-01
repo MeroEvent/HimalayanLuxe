@@ -54,7 +54,7 @@ const destinations = [
 
 export default function DestinationsPage() {
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
@@ -86,13 +86,13 @@ export default function DestinationsPage() {
                                 transition={{ duration: 0.8, delay: index * 0.1 }}
                                 className="group relative overflow-hidden rounded-[24px] aspect-[4/5] cursor-pointer"
                             >
-                                <img 
-                                    src={destination.image} 
+                                <img
+                                    src={destination.image}
                                     alt={destination.name}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
-                                
+
                                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                     <span className="text-gold text-xs tracking-[0.3em] uppercase mb-2 block">
                                         {destination.events}
@@ -120,7 +120,7 @@ export default function DestinationsPage() {
                             Can't Find Your Dream Location?
                         </h3>
                         <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed mb-8">
-                            We specialize in creating extraordinary events anywhere in the world. 
+                            We specialize in creating extraordinary events anywhere in the world.
                             Tell us your vision, and we'll make it a reality.
                         </p>
                         <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">

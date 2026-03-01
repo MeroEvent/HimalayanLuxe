@@ -3,7 +3,7 @@ import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function AboutPage() {
     return (
-        <div className="relative min-h-screen pt-32 pb-20">
+        <div className="relative min-h-screen pt-32 pb-0">
             {/* Hero Section */}
             <section className="relative w-full px-8 md:px-16 py-20">
                 <div className="max-w-[1400px] mx-auto">
@@ -20,7 +20,7 @@ export default function AboutPage() {
                             Crafting <span className="liquid-gold-text">Legacies</span> Since 2010
                         </h1>
                         <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed">
-                            We are not event planners. We are architects of emotion, curators of the extraordinary, 
+                            We are not event planners. We are architects of emotion, curators of the extraordinary,
                             and guardians of your most precious moments.
                         </p>
                     </motion.div>
@@ -36,11 +36,11 @@ export default function AboutPage() {
                         >
                             <h3 className="font-serif text-white/95 text-3xl mb-6">The Beginning</h3>
                             <p className="text-white/60 leading-relaxed mb-4">
-                                Founded in the heart of the Himalayas, our journey began with a singular vision: 
+                                Founded in the heart of the Himalayas, our journey began with a singular vision:
                                 to transform celebrations into timeless masterpieces that transcend generations.
                             </p>
                             <p className="text-white/60 leading-relaxed">
-                                What started as a passion for perfection has evolved into a legacy of creating 
+                                What started as a passion for perfection has evolved into a legacy of creating
                                 the world's most sought-after luxury events.
                             </p>
                         </motion.div>
@@ -54,11 +54,11 @@ export default function AboutPage() {
                         >
                             <h3 className="font-serif text-white/95 text-3xl mb-6">Our Philosophy</h3>
                             <p className="text-white/60 leading-relaxed mb-4">
-                                Every detail matters. Every moment counts. We believe that true luxury lies not 
+                                Every detail matters. Every moment counts. We believe that true luxury lies not
                                 in excess, but in the meticulous orchestration of perfection.
                             </p>
                             <p className="text-white/60 leading-relaxed">
-                                Our approach combines traditional grandeur with contemporary innovation, 
+                                Our approach combines traditional grandeur with contemporary innovation,
                                 creating experiences that are both timeless and revolutionary.
                             </p>
                         </motion.div>
@@ -101,7 +101,7 @@ export default function AboutPage() {
                             The <span className="liquid-gold-text">Artisans</span>
                         </h2>
                         <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed mb-12">
-                            Our team comprises world-renowned designers, master planners, and creative visionaries 
+                            Our team comprises world-renowned designers, master planners, and creative visionaries
                             who have orchestrated events for royalty, celebrities, and discerning families worldwide.
                         </p>
                         <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">
