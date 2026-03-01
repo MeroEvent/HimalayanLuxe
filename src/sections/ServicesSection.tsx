@@ -23,12 +23,9 @@ export default function ServicesSection() {
             ScrollTrigger.create({
                 trigger: card,
                 start: 'top top',
-                end: () => {
-                    if (isLastCard) {
-                        return `+=${window.innerHeight}`;
-                    }
-                    return nextCard ? () => `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`;
-                },
+                end: isLastCard 
+                    ? `+=${window.innerHeight}` 
+                    : (nextCard ? `${nextCard.offsetTop - card.offsetTop}px` : `+=${window.innerHeight * 2}`),
                 pin: true,
                 pinSpacing: false,
             });
