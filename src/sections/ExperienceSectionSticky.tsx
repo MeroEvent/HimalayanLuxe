@@ -29,7 +29,10 @@ export default function ExperienceSectionSticky({
         const section = sectionRef.current;
         const totalPhilosophies = philosophies.length;
 
-        // Set initial state for first image to be visible
+        // Set initial state for first content and image to be visible
+        if (contentRefs.current[0]) {
+            gsap.set(contentRefs.current[0], { y: '0%', opacity: 1 });
+        }
         if (imageRefs.current[0]) {
             gsap.set(imageRefs.current[0], { opacity: 1 });
         }
@@ -202,17 +205,17 @@ export default function ExperienceSectionSticky({
     return (
         <section 
             ref={sectionRef}
-            className="relative w-full" 
+            className="relative w-full mt-16 md:mt-24" 
             id="experience"
             style={{ height: `${philosophies.length * 100}vh` }}
         >
-            <div className="experience-sticky-content sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden">
+            <div className="experience-sticky-content sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 px-12 md:px-32 py-12">
-                    <div className="md:w-1/2 flex flex-col items-start text-left justify-center relative" style={{ minHeight: '70vh' }}>
+                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-between gap-3 md:gap-8 px-4 md:px-32 py-8 md:py-12">
+                    <div className="w-full md:w-1/2 flex flex-col items-start text-left justify-center relative min-h-[450px] md:min-h-0">
                         {/* Scrollable container for entire left content */}
-                        <div className="relative w-full flex items-center justify-center overflow-hidden" style={{ minHeight: '70vh' }}>
+                        <div className="relative w-full flex items-center justify-start md:justify-center overflow-hidden min-h-[450px] md:min-h-[60vh]">
                             {philosophies.map((philosophy, index) => (
                                 <div
                                     key={index}
@@ -220,35 +223,35 @@ export default function ExperienceSectionSticky({
                                     className="absolute top-0 left-0 w-full flex flex-col will-change-transform"
                                     style={{ transform: 'translateY(100%)', opacity: 0 }}
                                 >
-                                    <span className="liquid-gold-text text-[10px] md:text-xs tracking-[0.4em] uppercase font-medium mb-8 block">
+                                    <span className="liquid-gold-text text-[11px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] uppercase font-medium mb-3 md:mb-8 block">
                                         {philosophy.title}
                                     </span>
-                                    <h2 className="font-serif text-white/95 text-[clamp(24px,3vw,48px)] leading-[1.1] font-normal tracking-tight mb-[clamp(1rem,3vh,2rem)] max-w-xl">
+                                    <h2 className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] leading-[1.15] md:leading-[1.1] font-normal tracking-tight mb-3 md:mb-[clamp(1rem,3vh,2rem)] max-w-xl">
                                         {philosophy.heading}
                                     </h2>
-                                    <p className="text-white/50 font-sans max-w-lg text-[clamp(12px,1vw,14px)] leading-[1.6] tracking-wide mb-[clamp(1.5rem,4vh,2.5rem)]">
+                                    <p className="text-white/50 font-sans max-w-lg text-[15px] md:text-[clamp(14px,1vw,14px)] leading-[1.65] md:leading-[1.6] tracking-wide mb-5 md:mb-[clamp(1.5rem,4vh,2.5rem)]">
                                         {philosophy.description}
                                     </p>
 
                                     {/* Buttons inside each philosophy content */}
-                                    <div className="flex flex-col gap-8 mt-8">
+                                    <div className="flex flex-col gap-4 md:gap-8 mt-3 md:mt-8">
                                         <Link 
                                             to="/experience"
-                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit"
+                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-7 md:px-8 py-3.5 md:py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit"
                                         >
-                                            <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                            <span className="relative z-10 text-[11px] md:text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
                                                 Discover The Art
                                             </span>
                                         </Link>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2.5 md:gap-3">
                                             {philosophies.map((_, i) => (
                                                 <button
                                                     key={i}
                                                     onClick={() => scrollToPhilosophy(i)}
-                                                    className="group relative py-4"
+                                                    className="group relative py-2.5 md:py-4"
                                                 >
-                                                    <div className={`h-[2px] transition-all duration-700 rounded-full ${activePhilosophy === i ? 'w-12 bg-gold' : 'w-4 bg-white/20 group-hover:bg-white/40'}`} />
+                                                    <div className={`h-[2px] transition-all duration-700 rounded-full ${activePhilosophy === i ? 'w-9 md:w-12 bg-gold' : 'w-2.5 md:w-4 bg-white/20 group-hover:bg-white/40'}`} />
                                                 </button>
                                             ))}
                                         </div>
@@ -258,15 +261,15 @@ export default function ExperienceSectionSticky({
                         </div>
                     </div>
 
-                    <div className="md:w-1/2 relative h-[clamp(400px,60vh,700px)] w-full max-w-2xl rounded-[24px] md:rounded-[32px] p-2 md:p-3 shadow-2xl flex-shrink-0 border border-gold/20" style={{ background: 'transparent' }}>
-                        <div className="relative w-full h-full rounded-[20px] md:rounded-[28px] overflow-hidden bg-transparent">
+                    <div className="w-full md:w-1/2 relative h-[320px] md:h-[clamp(400px,60vh,700px)] max-w-2xl rounded-[16px] md:rounded-[32px] p-1.5 md:p-3 shadow-2xl flex-shrink-0 border border-gold/20" style={{ background: 'transparent' }}>
+                        <div className="relative w-full h-full rounded-[14px] md:rounded-[28px] overflow-hidden bg-transparent">
                             {philosophies.map((philosophy, index) => (
                                 <img
                                     key={index}
                                     ref={(el) => (imageRefs.current[index] = el)}
                                     src={philosophy.image}
                                     alt={philosophy.title}
-                                    className="absolute inset-0 w-full h-full object-cover rounded-[20px] md:rounded-[28px] will-change-opacity brightness-100"
+                                    className="absolute inset-0 w-full h-full object-cover rounded-[14px] md:rounded-[28px] will-change-opacity brightness-100"
                                     style={{ 
                                         opacity: index === 0 ? 1 : 0,
                                     }}
