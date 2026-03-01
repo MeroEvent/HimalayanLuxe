@@ -25,7 +25,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/10 to-black/80"></div>
             </div>
 
-            <div className="absolute bottom-[clamp(1.5rem,5vh,3rem)] right-[clamp(1.5rem,4vw,3rem)] z-40">
+            <div className="absolute bottom-[clamp(1.5rem,5vh,3rem)] right-[clamp(1.5rem,4vw,3rem)] z-40 hidden md:block">
                 <motion.button
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -66,7 +66,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ amount: 0.3 }}
                     transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                    className="font-serif text-white/95 text-[clamp(24px,4vw,64px)] font-normal leading-[1.1] max-w-[80vw] md:max-w-4xl tracking-tight drop-shadow-2xl"
+                    className="font-serif text-white/95 text-[clamp(32px,4vw,64px)] font-normal leading-[1.1] max-w-[80vw] md:max-w-4xl tracking-tight drop-shadow-2xl"
                 >
                     <motion.span
                         initial={{ opacity: 0, y: 30 }}
@@ -75,8 +75,8 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                         className="block mb-0 md:mb-2 pr-12 pb-2 overflow-visible"
                     >
-                        <span className="liquid-gold-text text-[clamp(14px,1.5vw,28px)] tracking-[0.1em] font-meno uppercase">Himalayan</span>
-                        <span className="font-cursive liquid-gold-text text-[clamp(28px,3.5vw,56px)] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
+                        <span className="liquid-gold-text text-[clamp(18px,1.5vw,28px)] tracking-[0.1em] font-meno uppercase">Himalayan</span>
+                        <span className="font-cursive liquid-gold-text text-[clamp(40px,3.5vw,56px)] font-medium pl-2 pr-2 tracking-wide">Luxe</span>
                     </motion.span>
                     the most sought after nuptial artist in the world
                 </motion.h2>

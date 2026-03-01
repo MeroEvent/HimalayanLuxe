@@ -28,6 +28,7 @@ function ScrollToTop() {
 function AppContent() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    // Show loader on first mount only (not on route changes)
     const [showLoader, setShowLoader] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
@@ -36,6 +37,7 @@ function AppContent() {
 
     const activeSectionRef = useRef('hero');
     const activePhilosophyRef = useRef(0);
+    const hasShownLoader = useRef(false);
 
     const location = useLocation();
     const isHomePage = location.pathname === '/';
@@ -65,9 +67,17 @@ function AppContent() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Only show loader once per component mount
     useEffect(() => {
-        const timer = setTimeout(() => setShowLoader(false), 4700);
-        return () => clearTimeout(timer);
+        if (!hasShownLoader.current) {
+            hasShownLoader.current = true;
+            const timer = setTimeout(() => {
+                setShowLoader(false);
+            }, 4700);
+            return () => clearTimeout(timer);
+        } else {
+            setShowLoader(false);
+        }
     }, []);
 
     const handleSectionClick = (id: string) => {

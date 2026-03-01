@@ -79,7 +79,7 @@ export default function ServicesSection() {
                 className="mb-16 flex flex-col items-center text-center"
             >
                 <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6">Masterpieces</span>
-                <h2 className="font-serif text-white/95 text-[clamp(24px,3.5vw,44px)] font-normal leading-tight">
+                <h2 className="font-serif text-white/95 text-[32px] md:text-[clamp(28px,3vw,48px)] font-normal leading-[1.15] md:leading-[1.1] tracking-tight">
                     Curated <span className="italic text-white/50">Excellence</span>
                 </h2>
             </motion.div>

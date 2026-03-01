@@ -23,7 +23,13 @@ export default function HomePage({
     setActivePhilosophy,
     activePhilosophyRef
 }: HomePageProps) {
-    const [isMuted, setIsMuted] = useState(true);
+    // Set initial muted state based on screen size
+    const [isMuted, setIsMuted] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 768; // Unmuted on mobile, muted on desktop
+        }
+        return true;
+    });
 
     return (
         <>
