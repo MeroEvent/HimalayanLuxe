@@ -55,7 +55,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     }, [isMuted]);
 
     return (
-        <section ref={sectionRef} className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden" id="hero">
+        <section ref={sectionRef} className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden mb-20 md:mb-0" id="hero">
             <div className="absolute inset-0 z-0">
                 <video
                     ref={videoRef}
@@ -105,7 +105,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                 </motion.button>
             </div>
 
-            <div className="absolute bottom-[clamp(1.5rem,5vh,3rem)] w-full px-[clamp(1.5rem,4vw,4rem)] flex flex-col items-start justify-end z-20">
+            <div className="absolute bottom-0 w-full px-[clamp(1.5rem,4vw,4rem)] pb-8 md:pb-8 pt-[120px] flex flex-col items-start justify-end z-20">
                 <motion.h2
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -118,7 +118,7 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ amount: 0.3 }}
                         transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="block mb-0 md:mb-2 pr-12 pb-2 overflow-visible"
+                        className="block pr-12 overflow-visible"
                     >
                         <span className="liquid-gold-text text-[clamp(18px,1.5vw,28px)] tracking-[0.1em] font-meno uppercase">Himalayan</span>
                         <span className="font-cursive liquid-gold-text text-[clamp(40px,3.5vw,56px)] font-medium pl-2 pr-2 tracking-wide">Luxe</span>

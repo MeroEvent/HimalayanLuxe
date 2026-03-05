@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function DestinationsSection() {
     return (
-        <section className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center pt-32 pb-20 px-8 md:px-12" id="destinations">
+        <section className="section-container relative min-h-[100dvh] w-full flex flex-col items-center justify-center py-12 md:py-20 px-8 md:px-12" id="destinations">
             <div className="w-full flex flex-col items-center max-w-[1400px] mx-auto">
                 <div className="w-full flex items-center justify-center mb-4">
                     <motion.div
