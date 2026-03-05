@@ -10,7 +10,7 @@ interface HeaderProps {
 
 export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }: HeaderProps) {
     return (
-        <header className={`fixed top-0 w-full z-[100] px-8 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-6 md:py-4' : 'py-12 md:py-10'}`}>
+        <header className={`fixed top-0 w-full z-[100] px-6 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-3 md:py-5 bg-transparent backdrop-blur-lg md:backdrop-blur-none' : 'py-8 md:py-10 bg-transparent'}`}>
             <a
                 href="/"
                 className="cursor-pointer"
