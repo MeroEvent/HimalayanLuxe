@@ -11,9 +11,17 @@ interface HeaderProps {
 export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }: HeaderProps) {
     return (
         <header className={`fixed top-0 w-full z-[100] px-8 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-6 md:py-4' : 'py-12 md:py-10'}`}>
-            <Link to="/" className="cursor-pointer">
+            <a
+                href="/"
+                className="cursor-pointer"
+                onClick={(e) => {
+                    if (window.location.pathname === '/') {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }}
+            >
                 <motion.img
-                    layoutId="himalayan-logo"
                     src="/LOGO.svg"
                     alt="Himalayan Luxe"
                     className="h-16 w-auto hover:opacity-80 transition-opacity duration-300"
@@ -21,7 +29,7 @@ export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }
                     animate={{ opacity: showLoader ? 0 : 1 }}
                     transition={{ duration: 0 }}
                 />
-            </Link>
+            </a>
 
             <motion.div
                 initial={{ opacity: 0, x: 50 }}
