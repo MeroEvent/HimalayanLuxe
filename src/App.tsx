@@ -67,18 +67,23 @@ function AppContent() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Only show loader once per component mount
+    // Show loader when entering the home page
     useEffect(() => {
-        if (!hasShownLoader.current) {
-            hasShownLoader.current = true;
-            const timer = setTimeout(() => {
-                setShowLoader(false);
-            }, 4700);
-            return () => clearTimeout(timer);
+        if (isHomePage) {
+            if (!hasShownLoader.current) {
+                setShowLoader(true);
+                hasShownLoader.current = true;
+                const timer = setTimeout(() => {
+                    setShowLoader(false);
+                }, 4700);
+                return () => clearTimeout(timer);
+            }
         } else {
+            // Reset loader tracker when leaving home so it shows again on next return
+            hasShownLoader.current = false;
             setShowLoader(false);
         }
-    }, []);
+    }, [isHomePage]);
 
     const handleSectionClick = (id: string) => {
         const element = document.getElementById(id);
@@ -86,9 +91,9 @@ function AppContent() {
             const navHeight = 0;
             const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - navHeight;
-            
+
             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            
+
             setActiveSection(id);
             activeSectionRef.current = id;
 
@@ -109,10 +114,10 @@ function AppContent() {
                 setMenuOpen={setMenuOpen}
             >
                 <Routes>
-                    <Route 
-                        path="/" 
+                    <Route
+                        path="/"
                         element={
-                            <HomePage 
+                            <HomePage
                                 activeSection={activeSection}
                                 setActiveSection={setActiveSection}
                                 activeSectionRef={activeSectionRef}
@@ -120,7 +125,7 @@ function AppContent() {
                                 setActivePhilosophy={setActivePhilosophy}
                                 activePhilosophyRef={activePhilosophyRef}
                             />
-                        } 
+                        }
                     />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/experience" element={<ExperiencePage />} />
