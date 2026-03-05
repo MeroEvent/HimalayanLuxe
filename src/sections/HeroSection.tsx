@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface HeroSectionProps {
     isMuted: boolean;
@@ -8,9 +8,54 @@ interface HeroSectionProps {
 
 export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
+    const sectionRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (video) {
+            video.muted = true; // Always start muted for autoplay
+            video.play().catch(error => {
+                console.log("Autoplay prevented:", error);
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        const section = sectionRef.current;
+
+        if (!video || !section) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        // Hero section is in view
+                        if (!isMuted) {
+                            video.muted = false;
+                        } else {
+                            video.muted = true;
+                        }
+                    } else {
+                        // Hero section is out of view - always mute
+                        video.muted = true;
+                    }
+                });
+            },
+            {
+                threshold: 0.1, // Trigger earlier
+            }
+        );
+
+        observer.observe(section);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [isMuted]);
 
     return (
-        <section className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden" id="hero">
+        <section ref={sectionRef} className="section-container relative min-h-[100dvh] w-full flex items-center justify-center overflow-hidden" id="hero">
             <div className="absolute inset-0 z-0">
                 <video
                     ref={videoRef}
