@@ -5,7 +5,7 @@ import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 const Skiper52 = () => {
   const images = [

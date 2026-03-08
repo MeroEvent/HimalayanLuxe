@@ -30,6 +30,7 @@ function AppContent() {
     const [isScrolled, setIsScrolled] = useState(false);
     // Show loader on first mount only (not on route changes)
     const [showLoader, setShowLoader] = useState(true);
+    const [videoReady, setVideoReady] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [activePhilosophy, setActivePhilosophy] = useState(0);
@@ -71,12 +72,16 @@ function AppContent() {
     useEffect(() => {
         if (!hasShownLoader.current) {
             hasShownLoader.current = true;
-            const timer = setTimeout(() => {
-                setShowLoader(false);
-            }, 4700);
-            return () => clearTimeout(timer);
+            // Pre-start video slightly before loader ends so it's ready
+            const videoTimer = setTimeout(() => setVideoReady(true), 4200);
+            const loaderTimer = setTimeout(() => setShowLoader(false), 4700);
+            return () => {
+                clearTimeout(videoTimer);
+                clearTimeout(loaderTimer);
+            };
         } else {
             setShowLoader(false);
+            setVideoReady(true);
         }
     }, []);
 
@@ -119,6 +124,7 @@ function AppContent() {
                                 activePhilosophy={activePhilosophy}
                                 setActivePhilosophy={setActivePhilosophy}
                                 activePhilosophyRef={activePhilosophyRef}
+                                showLoader={!videoReady}
                             />
                         } 
                     />

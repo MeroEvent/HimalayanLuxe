@@ -16,7 +16,7 @@ export default function Loader({ showLoader, isDesktop }: LoaderProps) {
                         initial={{ opacity: 1 }}
                         animate={{ opacity: [1, 1, 0] }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 4.0, times: [0, 0.675, 1], ease: 'easeInOut' }}
+                        transition={{ duration: 4.7, times: [0, 0.85, 1], ease: 'easeInOut' }}
                     >
                         <Silk
                             speed={0.8}

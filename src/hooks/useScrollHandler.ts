@@ -1,96 +1,67 @@
 import { useEffect } from 'react';
-import Lenis from 'lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { philosophiesData } from '../data/philosophies';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface UseScrollHandlerProps {
-    showLoader: boolean;
-    isHomePage: boolean;
-    setIsScrolled: (scrolled: boolean) => void;
-    setActiveSection: (section: string) => void;
-    setActivePhilosophy: (index: number) => void;
-    activePhilosophy: number;
-    activeSectionRef: React.MutableRefObject<string>;
-    activePhilosophyRef: React.MutableRefObject<number>;
+  showLoader: boolean;
+  isHomePage: boolean;
+  setIsScrolled: (scrolled: boolean) => void;
+  setActiveSection: (section: string) => void;
+  setActivePhilosophy: (index: number) => void;
+  activePhilosophy: number;
+  activeSectionRef: React.MutableRefObject<string>;
+  activePhilosophyRef: React.MutableRefObject<number>;
 }
 
 export function useScrollHandler({
-    showLoader,
-    isHomePage,
-    setIsScrolled,
-    setActiveSection,
-    setActivePhilosophy,
-    activePhilosophy,
-    activeSectionRef,
-    activePhilosophyRef
+  showLoader,
+  isHomePage,
+  setIsScrolled,
+  setActiveSection,
+  setActivePhilosophy,
+  activePhilosophy,
+  activeSectionRef,
+  activePhilosophyRef,
 }: UseScrollHandlerProps) {
-    useEffect(() => {
-        if (showLoader) return;
+  useEffect(() => {
+    if (showLoader || !isHomePage) return;
 
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-        });
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
 
-        // Sync Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update);
-
-        gsap.ticker.add((time) => {
-            lenis.raf(time * 1000);
-        });
-
-        gsap.ticker.lagSmoothing(0);
-
-        const handleScroll = () => {
-            const scrollY = window.scrollY;
-            setIsScrolled(scrollY > 100);
-
-            if (!isHomePage) return;
-
-            const heroSection = document.getElementById('hero');
-            if (heroSection) {
-                const heroHeight = heroSection.offsetHeight;
-                setIsScrolled(scrollY > heroHeight - 100);
+      // Section detection logic
+      const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            if (activeSectionRef.current !== section) {
+              setActiveSection(section);
+              activeSectionRef.current = section;
             }
-
-            const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
-            sections.forEach((sectionId) => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    const rect = element.getBoundingClientRect();
-                    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-                        setActiveSection(sectionId);
-                        activeSectionRef.current = sectionId;
-                    }
-                }
-            });
-        };
-
-        lenis.on('scroll', handleScroll);
-
-        function raf(time: number) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
+            break;
+          }
         }
+      }
 
-        const rafId = requestAnimationFrame(raf);
-        handleScroll();
+      // Philosophy scroll detection (if in experience section)
+      if (activeSectionRef.current === 'experience') {
+        const philosophyElements = document.querySelectorAll('[data-philosophy-index]');
+        philosophyElements.forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            const index = parseInt(el.getAttribute('data-philosophy-index') || '0');
+            if (activePhilosophyRef.current !== index) {
+              setActivePhilosophy(index);
+              activePhilosophyRef.current = index;
+            }
+          }
+        });
+      }
+    };
 
-        return () => {
-            lenis.destroy();
-            cancelAnimationFrame(rafId);
-            gsap.ticker.remove((time) => {
-                lenis.raf(time * 1000);
-            });
-        };
-    }, [showLoader, activePhilosophy, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [showLoader, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activePhilosophy, activeSectionRef, activePhilosophyRef]);
 }

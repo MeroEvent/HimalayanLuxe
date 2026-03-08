@@ -13,6 +13,7 @@ interface HomePageProps {
     activePhilosophy: number;
     setActivePhilosophy: (index: number) => void;
     activePhilosophyRef: React.MutableRefObject<number>;
+    showLoader?: boolean;
 }
 
 export default function HomePage({ 
@@ -21,7 +22,8 @@ export default function HomePage({
     activeSectionRef,
     activePhilosophy,
     setActivePhilosophy,
-    activePhilosophyRef
+    activePhilosophyRef,
+    showLoader
 }: HomePageProps) {
     // Set initial muted state based on screen size
     const [isMuted, setIsMuted] = useState(() => {
