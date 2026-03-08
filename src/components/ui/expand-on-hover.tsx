@@ -6,55 +6,16 @@ import "swiper/css/effect-creative";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { destinationsData } from "@/data/destinations";
 
 const Skiper52 = () => {
-  const images = [
-    {
-      src: "https://images.unsplash.com/photo-1745677617593-75a5bbd1a8f7?auto=format&fit=crop&w=800&q=80",
-      alt: "Phewa Lake",
-      code: "PHEWA LAKE",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1640876522637-9432f175581f?auto=format&fit=crop&w=800&q=80",
-      alt: "Annapurna Himalaya",
-      code: "ANNAPURNA",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1592731056711-b3101e30584b?auto=format&fit=crop&w=800&q=80",
-      alt: "Mustang",
-      code: "MUSTANG",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
-      alt: "Illam",
-      code: "ILLAM",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1673129864790-0fa848c4720e?auto=format&fit=crop&w=800&q=80",
-      alt: "Badimalika",
-      code: "BADIMALIKA",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1733899740934-95dd57fc113b?auto=format&fit=crop&w=800&q=80",
-      alt: "Manang",
-      code: "MANANG",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1596221897845-b8ebacc61293?auto=format&fit=crop&w=800&q=80",
-      alt: "Solukhumbu",
-      code: "SOLUKHUMBU",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1680112365184-dc7dfb5db6ed?auto=format&fit=crop&w=800&q=80",
-      alt: "Gorkha",
-      code: "GORKHA",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2674&auto=format&fit=crop",
-      alt: "Lumbini",
-      code: "LUMBINI",
-    },
-  ];
+  const images = destinationsData.map((d) => ({
+    src: d.image,
+    alt: d.name,
+    code: d.code,
+    id: d.id,
+  }));
 
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
@@ -69,11 +30,12 @@ const HoverExpand_001 = ({
   images,
   className,
 }: {
-  images: { src: string; alt: string; code: string }[];
+  images: { src: string; alt: string; code: string; id: string }[];
   className?: string;
 }) => {
   const [activeImage, setActiveImage] = useState<number>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -311,11 +273,20 @@ const HoverExpand_001 = ({
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="absolute flex h-full w-full flex-col items-end justify-end p-4"
+                      className="absolute flex h-full w-full flex-col items-end justify-end p-4 pointer-events-none"
                     >
-                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider">
+                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
                         {image.code}
                       </p>
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          navigate(`/destinations/${image.id}`); 
+                        }}
+                        className="pointer-events-auto px-4 py-2 bg-gold text-black rounded-full text-[10px] uppercase tracking-widest hover:bg-[#F2D06B] transition-colors"
+                      >
+                         View Details
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
