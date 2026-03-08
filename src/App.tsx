@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import 'lenis/dist/lenis.css';
 import AppLayout from './components/layout/AppLayout';
+import WhatsAppFloat from './components/common/WhatsAppFloat';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
@@ -75,6 +76,7 @@ function AppContent() {
 
     return (
         <div className="relative">
+            <WhatsAppFloat />
             <AppLayout
                 showLoader={showLoader}
                 isDesktop={isDesktop}

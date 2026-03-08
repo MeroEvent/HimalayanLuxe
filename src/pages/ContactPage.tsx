@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { CustomDatePicker } from '../components/ui/CustomDatePicker';
-import { Instagram, Facebook } from 'lucide-react';
+import { Instagram, Facebook, CheckCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -13,10 +14,55 @@ export default function ContactPage() {
         date: '',
         message: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            // Save to Supabase
+            const { error: dbError } = await supabase.from('inquiries').insert({
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || null,
+                event_type: formData.eventType,
+                preferred_date: formData.date || null,
+                message: formData.message,
+            });
+
+            if (dbError) throw dbError;
+
+            // Fire-and-forget email notification (don't block form success)
+            fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/swift-api`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone || null,
+                    event_type: formData.eventType,
+                    preferred_date: formData.date || null,
+                    message: formData.message,
+                }),
+            }).then(async (res) => {
+                const data = await res.json().catch(() => null);
+                console.log('[notify-inquiry]', res.status, data);
+            }).catch((err) => console.error('[notify-inquiry] failed:', err));
+
+            setSubmitted(true);
+            setFormData({ name: '', email: '', phone: '', eventType: '', date: '', message: '' });
+        } catch (err) {
+            setError((err as Error).message || 'Something went wrong. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -50,7 +96,30 @@ export default function ContactPage() {
                             className="lg:col-span-7 lg:row-span-3 glass-card p-8 md:p-12 rounded-[32px] flex flex-col justify-center"
                         >
                             <h3 className="font-serif text-white/95 text-3xl mb-8">Send an Inquiry</h3>
+
+                            {submitted ? (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex flex-col items-center justify-center py-12 text-center"
+                                >
+                                    <CheckCircle className="w-16 h-16 text-gold mb-6" />
+                                    <h4 className="font-serif text-white/95 text-2xl mb-3">Thank You</h4>
+                                    <p className="text-white/60 mb-8 max-w-md">Your inquiry has been submitted. We'll get back to you shortly.</p>
+                                    <button
+                                        onClick={() => setSubmitted(false)}
+                                        className="border border-gold/30 px-8 py-3 rounded-xl text-xs font-medium uppercase tracking-[0.2em] text-gold hover:bg-gold/10 transition-all"
+                                    >
+                                        Send Another
+                                    </button>
+                                </motion.div>
+                            ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {error && (
+                                    <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
+                                        {error}
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-white/70 text-sm mb-2 tracking-wide">
@@ -133,13 +202,15 @@ export default function ContactPage() {
 
                                 <button
                                     type="submit"
-                                    className="w-full group relative overflow-hidden rounded-xl border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 lg:col-span-2"
+                                    disabled={isSubmitting}
+                                    className="w-full group relative overflow-hidden rounded-xl border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 lg:col-span-2 disabled:opacity-50"
                                 >
                                     <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                        Submit Inquiry
+                                        {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
                                     </span>
                                 </button>
                             </form>
+                            )}
                         </motion.div>
 
                         {/* Contact Info Bento Box */}
