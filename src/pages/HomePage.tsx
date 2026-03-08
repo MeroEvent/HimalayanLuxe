@@ -16,22 +16,17 @@ interface HomePageProps {
     showLoader?: boolean;
 }
 
-export default function HomePage({ 
-    activeSection, 
-    setActiveSection, 
+export default function HomePage({
+    activeSection,
+    setActiveSection,
     activeSectionRef,
     activePhilosophy,
     setActivePhilosophy,
     activePhilosophyRef,
     showLoader
 }: HomePageProps) {
-    // Set initial muted state based on screen size
-    const [isMuted, setIsMuted] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return window.innerWidth >= 768; // Unmuted on mobile, muted on desktop
-        }
-        return true;
-    });
+    // Start muted to ensure autoplay works on all devices (especially mobile)
+    const [isMuted, setIsMuted] = useState(true);
 
     return (
         <>

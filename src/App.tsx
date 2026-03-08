@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import 'lenis/dist/lenis.css';
 import AppLayout from './components/layout/AppLayout';
-import SectionPagination from './components/common/SectionPagination';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
@@ -17,7 +16,6 @@ function ScrollToTop() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        // Also force scroll for any Lenis instance
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
     }, [pathname]);
@@ -28,13 +26,10 @@ function ScrollToTop() {
 function AppContent() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    // Show loader on first mount only (not on route changes)
     const [showLoader, setShowLoader] = useState(true);
-    const [videoReady, setVideoReady] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [activePhilosophy, setActivePhilosophy] = useState(0);
-    const [showActiveLabel, setShowActiveLabel] = useState(true);
 
     const activeSectionRef = useRef('hero');
     const activePhilosophyRef = useRef(0);
@@ -42,13 +37,6 @@ function AppContent() {
 
     const location = useLocation();
     const isHomePage = location.pathname === '/';
-    const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
-
-    useEffect(() => {
-        setShowActiveLabel(true);
-        const timer = setTimeout(() => setShowActiveLabel(false), 3000);
-        return () => clearTimeout(timer);
-    }, [activeSection]);
 
     useScrollHandler({
         showLoader,
@@ -68,41 +56,22 @@ function AppContent() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Only show loader once per component mount
+    // Show loader when entering the home page
     useEffect(() => {
-        if (!hasShownLoader.current) {
-            hasShownLoader.current = true;
-            // Pre-start video slightly before loader ends so it's ready
-            const videoTimer = setTimeout(() => setVideoReady(true), 4200);
-            const loaderTimer = setTimeout(() => setShowLoader(false), 4700);
-            return () => {
-                clearTimeout(videoTimer);
-                clearTimeout(loaderTimer);
-            };
-        } else {
-            setShowLoader(false);
-            setVideoReady(true);
-        }
-    }, []);
-
-    const handleSectionClick = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            const navHeight = 0;
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - navHeight;
-            
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            
-            setActiveSection(id);
-            activeSectionRef.current = id;
-
-            if (id === 'experience') {
-                setActivePhilosophy(0);
-                activePhilosophyRef.current = 0;
+        if (isHomePage) {
+            if (!hasShownLoader.current) {
+                setShowLoader(true);
+                hasShownLoader.current = true;
+                const timer = setTimeout(() => {
+                    setShowLoader(false);
+                }, 4700);
+                return () => clearTimeout(timer);
             }
+        } else {
+            hasShownLoader.current = false;
+            setShowLoader(false);
         }
-    };
+    }, [isHomePage]);
 
     return (
         <div className="relative">
@@ -114,19 +83,19 @@ function AppContent() {
                 setMenuOpen={setMenuOpen}
             >
                 <Routes>
-                    <Route 
-                        path="/" 
+                    <Route
+                        path="/"
                         element={
-                            <HomePage 
+                            <HomePage
                                 activeSection={activeSection}
                                 setActiveSection={setActiveSection}
                                 activeSectionRef={activeSectionRef}
                                 activePhilosophy={activePhilosophy}
                                 setActivePhilosophy={setActivePhilosophy}
                                 activePhilosophyRef={activePhilosophyRef}
-                                showLoader={!videoReady}
+                                showLoader={showLoader}
                             />
-                        } 
+                        }
                     />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/experience" element={<ExperiencePage />} />
