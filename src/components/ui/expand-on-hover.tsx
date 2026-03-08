@@ -10,49 +10,44 @@ import { cn } from "@/lib/utils";
 const Skiper52 = () => {
   const images = [
     {
-      src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
-      alt: "Wedding ceremony",
-      code: "# 01",
+      src: "https://unsplash.com/photos/yDtB8FppNK0/download?force=true",
+      alt: "Phewa Lake",
+      code: "PHEWA LAKE",
     },
     {
-      src: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800",
-      alt: "Wedding couple",
-      code: "# 02",
+      src: "https://unsplash.com/photos/PbCCnvId660/download?force=true",
+      alt: "Annapurna Himalaya",
+      code: "ANNAPURNA",
     },
     {
-      src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800",
-      alt: "Wedding reception",
-      code: "# 03",
+      src: "https://unsplash.com/photos/KM1QLHnxA4c/download?force=true",
+      alt: "Mustang",
+      code: "MUSTANG",
     },
     {
-      src: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800",
-      alt: "Wedding details",
-      code: "# 04",
+      src: "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80",
+      alt: "Illam",
+      code: "ILLAM",
     },
     {
-      src: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800",
-      alt: "Wedding venue",
-      code: "# 05",
+      src: "https://unsplash.com/photos/LoFYw82KdjY/download?force=true",
+      alt: "Badimalika",
+      code: "BADIMALIKA",
     },
     {
-      src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800",
-      alt: "Wedding celebration",
-      code: "# 06",
+      src: "https://unsplash.com/photos/AJ3_RYsJs94/download?force=true",
+      alt: "Manang",
+      code: "MANANG",
     },
     {
-      src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=800",
-      alt: "Wedding decor",
-      code: "# 07",
+      src: "https://unsplash.com/photos/Q5YNyu88_RU/download?force=true",
+      alt: "Solukhumbu",
+      code: "SOLUKHUMBU",
     },
     {
-      src: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800",
-      alt: "Wedding flowers",
-      code: "# 08",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800",
-      alt: "Wedding moments",
-      code: "# 09",
+      src: "https://unsplash.com/photos/xXrH3Oj5HZI/download?force=true",
+      alt: "Gorkha",
+      code: "GORKHA",
     },
   ];
 
