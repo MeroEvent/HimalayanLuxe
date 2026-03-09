@@ -24,18 +24,16 @@ export default function AppLayout({
 }: AppLayoutProps) {
     return (
         <div className="relative min-h-screen">
-            {!showLoader && (
-                <div className="fixed inset-0 z-0 pointer-events-none">
-                    <Silk
-                        speed={0.8}
-                        scale={0.8}
-                        color="#50C878"
-                        noiseIntensity={3.5}
-                        rotation={0}
-                    />
-                    <div className="absolute inset-0 bg-black/70"></div>
-                </div>
-            )}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <Silk
+                    speed={0.8}
+                    scale={0.8}
+                    color="#50C878"
+                    noiseIntensity={3.5}
+                    rotation={0}
+                />
+                <div className="absolute inset-0 bg-black/70"></div>
+            </div>
 
             <Loader showLoader={showLoader} isDesktop={isDesktop} />
 
