@@ -227,19 +227,19 @@ const HoverExpand_001 = ({
                 transition={{
                   opacity: { duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
                   x: { duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
-                  width: { duration: 0.15, ease: [0.22, 1, 0.36, 1] },
-                  height: { duration: 0.15, ease: [0.22, 1, 0.36, 1] }
+                  width: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+                  height: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
                 }}
                 onClick={() => setActiveImage(index)}
                 onPointerEnter={() => setActiveImage(index)}
               >
                 <div 
-                  className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent transition-opacity duration-150"
+                  className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent transition-opacity duration-300"
                   style={{ opacity: activeImage === index ? 1 : 0 }}
                 />
 
                 <div 
-                  className="absolute flex h-full w-full flex-col items-end justify-end p-4 transition-opacity duration-150 pointer-events-none"
+                  className="absolute flex h-full w-full flex-col items-end justify-end p-4 transition-opacity duration-300 pointer-events-none"
                   style={{ opacity: activeImage === index ? 1 : 0 }}
                 >
                   <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
