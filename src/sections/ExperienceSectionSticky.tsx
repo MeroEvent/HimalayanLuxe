@@ -225,7 +225,7 @@ export default function ExperienceSectionSticky({
 
     if (!isDesktop) {
         return (
-            <section className="relative w-full pt-24 pb-12 px-6 overflow-hidden bg-transparent" id="experience">
+            <section className="relative w-full py-16 md:py-24 px-6 md:px-12 overflow-hidden bg-transparent" id="experience">
                 <div className="flex flex-col items-center text-center gap-6 mb-12">
                     <span className="liquid-gold-text text-[10px] tracking-[0.3em] uppercase font-medium">Experience</span>
                     <h2 className="font-serif text-white/95 text-4xl leading-[1.1] font-normal tracking-tight mx-auto max-w-[280px]">The Art of <span className="italic text-white/50">Details</span></h2>
@@ -300,7 +300,7 @@ export default function ExperienceSectionSticky({
             <div className="experience-sticky-content sticky top-0 left-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-8 px-6 md:px-32">
+                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-8 px-6 md:px-12">
                     {/* Image Section - First on Mobile, Second on Desktop */}
                     <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center items-center">
                         <div className="relative w-full aspect-[4/3] md:h-[clamp(400px,60vh,700px)] max-w-2xl rounded-[16px] md:rounded-[32px] p-1 md:p-3 shadow-2xl border border-gold/20 bg-transparent flex-shrink-0">

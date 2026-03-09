@@ -1,6 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
@@ -74,6 +75,7 @@ const HoverExpand_001 = ({
 }) => {
   const [activeImage, setActiveImage] = useState<number | null>(1);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const navigate = useNavigate();
 
   // Memoize isMobile to prevent recalculation on every render
   const isMobile = useMemo(() => {
@@ -98,7 +100,8 @@ const HoverExpand_001 = ({
         <div className="flex flex-col gap-4 md:hidden px-2">
           {/* Row 1: Large featured card */}
           <motion.div
-            className="relative overflow-hidden rounded-3xl border border-gold/30 h-[400px] w-full"
+            onClick={() => navigate('/destinations')}
+            className="relative overflow-hidden rounded-3xl border border-gold/30 h-[400px] w-full cursor-pointer"
             initial={{ opacity: 0, y: 30 }}
             animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -128,7 +131,8 @@ const HoverExpand_001 = ({
             {images.slice(1, 3).map((image, idx) => (
               <motion.div
                 key={idx + 1}
-                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px]"
+                onClick={() => navigate('/destinations')}
+                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px] cursor-pointer"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: 0.1 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
@@ -155,7 +159,8 @@ const HoverExpand_001 = ({
             {images.slice(3, 6).map((image, idx) => (
               <motion.div
                 key={idx + 3}
-                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[180px]"
+                onClick={() => navigate('/destinations')}
+                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[180px] cursor-pointer"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: 0.15 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
@@ -181,7 +186,8 @@ const HoverExpand_001 = ({
             {images.slice(6, 8).map((image, idx) => (
               <motion.div
                 key={idx + 6}
-                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px]"
+                onClick={() => navigate('/destinations')}
+                className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px] cursor-pointer"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.6, delay: 0.2 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
@@ -206,7 +212,8 @@ const HoverExpand_001 = ({
           {/* Row 5: Final large card */}
           {images.length > 8 && (
             <motion.div
-              className="relative overflow-hidden rounded-3xl border border-gold/30 h-[360px] w-full"
+              onClick={() => navigate('/destinations')}
+              className="relative overflow-hidden rounded-3xl border border-gold/30 h-[360px] w-full cursor-pointer"
               initial={{ opacity: 0, y: 30 }}
               animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
@@ -262,7 +269,10 @@ const HoverExpand_001 = ({
                   width: { duration: 0.15, ease: [0.22, 1, 0.36, 1] },
                   height: { duration: 0.15, ease: [0.22, 1, 0.36, 1] }
                 }}
-                onClick={() => setActiveImage(index)}
+                onClick={() => {
+                  setActiveImage(index);
+                  navigate('/destinations');
+                }}
                 onPointerEnter={() => setActiveImage(index)}
               >
                 <div 

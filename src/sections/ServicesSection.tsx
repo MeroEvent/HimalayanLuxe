@@ -76,7 +76,7 @@ export default function ServicesSection() {
     }, []);
 
     return (
-        <section className="relative w-full pt-20 pb-20 px-4 md:px-8" id="services">
+        <section className="relative w-full py-16 md:py-24 px-6 md:px-12" id="services">
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
