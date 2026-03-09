@@ -101,7 +101,7 @@ export default function Footer() {
 
                 <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-white/40">
                     <a href="#" className="hover:text-gold transition-colors duration-500">Cookie Policy</a>
-                    <a href="#" className="hover:text-gold transition-colors duration-500">Privacy Policy</a>
+                    <Link to="/privacy-policy" className="hover:text-gold transition-colors duration-500">Privacy Policy</Link>
                     <a href="#" className="hover:text-gold transition-colors duration-500">Website Terms</a>
                 </div>
 
