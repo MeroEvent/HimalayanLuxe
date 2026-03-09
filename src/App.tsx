@@ -13,13 +13,34 @@ import ContactPage from './pages/ContactPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
 
 function ScrollToTop() {
-    const { pathname } = useLocation();
+    const { pathname, search } = useLocation();
 
     useEffect(() => {
+        // Disable browser's automatic scroll restoration to prevent flickering
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
+        // Multiple aggressive scroll resets
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
-    }, [pathname]);
+
+        // Also scroll the primary scroll container if it exists
+        const scrollContainer = document.querySelector('main') || document.documentElement;
+        if (scrollContainer) {
+            scrollContainer.scrollTop = 0;
+        }
+
+        // Additional reset after a tiny delay to catch any post-render adjustments
+        const timer = setTimeout(() => {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 10);
+
+        return () => clearTimeout(timer);
+    }, [pathname, search]);
 
     return null;
 }

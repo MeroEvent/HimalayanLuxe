@@ -93,5 +93,5 @@ export function useScrollHandler({
                 lenis.raf(time * 1000);
             });
         };
-    }, [showLoader, activePhilosophy, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
+    }, [showLoader, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
 }
