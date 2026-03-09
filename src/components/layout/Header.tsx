@@ -26,7 +26,7 @@ export default function Header({ isScrolled, showLoader, menuOpen, setMenuOpen }
     }, [menuOpen, setMenuOpen]);
 
     return (
-        <header className={`fixed top-0 w-full z-[100] px-6 md:px-12 flex items-center justify-between transition-all duration-700 ${isScrolled ? 'py-3 md:py-5 bg-transparent backdrop-blur-lg md:backdrop-blur-none' : 'py-8 md:py-10 bg-transparent'}`}>
+        <header className={`fixed top-0 w-full z-[100] px-6 md:px-12 flex items-center justify-between transition-all duration-700 ease-in-out ${isScrolled ? 'py-3 md:py-4 bg-[#022E22]/30 backdrop-blur-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)]' : 'py-8 md:py-10 bg-gradient-to-b from-black/40 to-transparent'}`}>
             <a
                 href="/"
                 className="cursor-pointer"

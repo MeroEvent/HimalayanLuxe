@@ -66,7 +66,7 @@ export default function NavigationOverlay({ menuOpen, setMenuOpen }: NavigationO
 
     return (
         <div
-            className={`fixed inset-0 z-[500] transition-transform duration-1000 ease-in-out overflow-hidden backdrop-blur-xl ${menuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
+            className={`fixed inset-0 z-[500] transition-all duration-1000 ease-in-out overflow-hidden backdrop-blur-xl ${menuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
                 }`}
             onClick={() => setMenuOpen(false)}
         >
