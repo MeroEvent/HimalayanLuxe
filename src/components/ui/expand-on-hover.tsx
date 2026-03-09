@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
@@ -37,6 +37,11 @@ const HoverExpand_001 = ({
   const [hasAnimated, setHasAnimated] = useState(false);
   const navigate = useNavigate();
 
+  // Memoize isMobile to prevent recalculation on every render
+  const isMobile = useMemo(() => {
+    return typeof window !== 'undefined' && window.innerWidth < 1024;
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, translateY: 20 }}
@@ -49,11 +54,7 @@ const HoverExpand_001 = ({
       }}
       className={cn("relative w-full px-0", className)}
     >
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="w-full"
+      <div className="w-full"
       >
         {/* Mobile Premium Masonry Layout */}
         <div className="flex flex-col gap-4 md:hidden px-2">
@@ -62,14 +63,11 @@ const HoverExpand_001 = ({
             className="relative overflow-hidden rounded-3xl border border-gold/30 h-[400px] w-full"
             initial={{ opacity: 0, y: 30 }}
             animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-            <motion.div
+            <div
               className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
             >
               <div className="w-16 h-[2px] bg-gold mb-4" />
               <p className="text-base text-gold font-medium tracking-[0.2em] uppercase mb-2">
@@ -78,16 +76,13 @@ const HoverExpand_001 = ({
               <p className="text-sm text-white/70 tracking-wide">
                 {images[0].alt}
               </p>
-            </motion.div>
-            <motion.img
+            </div>
+            <img
               src={images[0].src}
               className="size-full object-cover"
               alt={images[0].alt}
               loading="lazy"
               decoding="async"
-              initial={{ scale: 1.1 }}
-              animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-              transition={{ duration: 1.2 }}
             />
           </motion.div>
 
@@ -99,7 +94,7 @@ const HoverExpand_001 = ({
                 className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px]"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.1 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, delay: 0.1 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="absolute h-full w-full bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
                 <div className="absolute flex h-full w-full flex-col items-start justify-end p-4 z-20">
@@ -108,15 +103,12 @@ const HoverExpand_001 = ({
                     {image.code}
                   </p>
                 </div>
-                <motion.img
+                <img
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
                   loading="lazy"
                   decoding="async"
-                  initial={{ scale: 1.1 }}
-                  animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-                  transition={{ duration: 1.2, delay: 0.1 + (idx * 0.1) }}
                 />
               </motion.div>
             ))}
@@ -130,7 +122,7 @@ const HoverExpand_001 = ({
                 className="relative overflow-hidden rounded-2xl border border-gold/30 h-[180px]"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.2 + (idx * 0.08), ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, delay: 0.15 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="absolute h-full w-full bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
                 <div className="absolute flex h-full w-full flex-col items-center justify-end p-3 z-20">
@@ -138,15 +130,12 @@ const HoverExpand_001 = ({
                     {image.code}
                   </p>
                 </div>
-                <motion.img
+                <img
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
                   loading="lazy"
                   decoding="async"
-                  initial={{ scale: 1.1 }}
-                  animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-                  transition={{ duration: 1.2, delay: 0.2 + (idx * 0.08) }}
                 />
               </motion.div>
             ))}
@@ -160,7 +149,7 @@ const HoverExpand_001 = ({
                 className="relative overflow-hidden rounded-2xl border border-gold/30 h-[240px]"
                 initial={{ opacity: 0, y: 30 }}
                 animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.3 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, delay: 0.2 + (idx * 0.05), ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="absolute h-full w-full bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
                 <div className="absolute flex h-full w-full flex-col items-start justify-end p-4 z-20">
@@ -169,15 +158,12 @@ const HoverExpand_001 = ({
                     {image.code}
                   </p>
                 </div>
-                <motion.img
+                <img
                   src={image.src}
                   className="size-full object-cover"
                   alt={image.alt}
                   loading="lazy"
                   decoding="async"
-                  initial={{ scale: 1.1 }}
-                  animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-                  transition={{ duration: 1.2, delay: 0.3 + (idx * 0.1) }}
                 />
               </motion.div>
             ))}
@@ -189,14 +175,11 @@ const HoverExpand_001 = ({
               className="relative overflow-hidden rounded-3xl border border-gold/30 h-[360px] w-full"
               initial={{ opacity: 0, y: 30 }}
               animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="absolute h-full w-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-              <motion.div
+              <div
                 className="absolute flex h-full w-full flex-col items-start justify-end p-6 z-20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
               >
                 <div className="w-16 h-[2px] bg-gold mb-4" />
                 <p className="text-base text-gold font-medium tracking-[0.2em] uppercase mb-2">
@@ -205,16 +188,13 @@ const HoverExpand_001 = ({
                 <p className="text-sm text-white/70 tracking-wide">
                   {images[8].alt}
                 </p>
-              </motion.div>
-              <motion.img
+              </div>
+              <img
                 src={images[8].src}
                 className="size-full object-cover"
                 alt={images[8].alt}
                 loading="lazy"
                 decoding="async"
-                initial={{ scale: 1.1 }}
-                animate={hasAnimated ? { scale: 1 } : { scale: 1.1 }}
-                transition={{ duration: 1.2, delay: 0.4 }}
               />
             </motion.div>
           )}
@@ -223,9 +203,6 @@ const HoverExpand_001 = ({
         {/* Desktop Expand on Hover Layout */}
         <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8">
           {images.map((image, index) => {
-            const isWindowDefined = typeof window !== 'undefined';
-            const isMobile = isWindowDefined && window.innerWidth < 1024;
-
             return (
               <motion.div
                 key={index}
@@ -248,48 +225,36 @@ const HoverExpand_001 = ({
                   height: isMobile ? "15rem" : "24rem"
                 }}
                 transition={{
-                  opacity: { duration: 1.2, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] },
-                  x: { duration: 1.2, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] },
-                  width: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
-                  height: { duration: 1.0, ease: [0.16, 1, 0.3, 1] }
+                  opacity: { duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+                  x: { duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+                  width: { duration: 0.15, ease: [0.22, 1, 0.36, 1] },
+                  height: { duration: 0.15, ease: [0.22, 1, 0.36, 1] }
                 }}
                 onClick={() => setActiveImage(index)}
+                onPointerEnter={() => setActiveImage(index)}
               >
-                <AnimatePresence>
-                  {activeImage === index && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent"
-                    />
-                  )}
-                </AnimatePresence>
+                <div 
+                  className="absolute h-full w-full bg-gradient-to-t from-black/60 via-gold/10 to-transparent transition-opacity duration-150"
+                  style={{ opacity: activeImage === index ? 1 : 0 }}
+                />
 
-                <AnimatePresence>
-                  {activeImage === index && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute flex h-full w-full flex-col items-end justify-end p-4 pointer-events-none"
-                    >
-                      <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
-                        {image.code}
-                      </p>
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          navigate(`/destinations/${image.id}`); 
-                        }}
-                        className="pointer-events-auto px-4 py-2 bg-gold text-black rounded-full text-[10px] uppercase tracking-widest hover:bg-[#F2D06B] transition-colors"
-                      >
-                         View Details
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div 
+                  className="absolute flex h-full w-full flex-col items-end justify-end p-4 transition-opacity duration-150 pointer-events-none"
+                  style={{ opacity: activeImage === index ? 1 : 0 }}
+                >
+                  <p className="text-left text-xs text-gold/80 font-medium tracking-wider mb-2">
+                    {image.code}
+                  </p>
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      navigate(`/destinations/${image.id}`); 
+                    }}
+                    className="pointer-events-auto px-4 py-2 bg-gold text-black rounded-full text-[10px] uppercase tracking-widest hover:bg-[#F2D06B] transition-colors"
+                  >
+                     View Details
+                  </button>
+                </div>
 
                 <img
                   src={image.src}
@@ -302,7 +267,7 @@ const HoverExpand_001 = ({
             );
           })}
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
