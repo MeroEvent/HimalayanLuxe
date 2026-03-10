@@ -69,10 +69,7 @@ function AppContent() {
         isHomePage,
         setIsScrolled,
         setActiveSection,
-        setActivePhilosophy,
-        activePhilosophy,
         activeSectionRef,
-        activePhilosophyRef
     });
 
     useEffect(() => {
