@@ -15,6 +15,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiesPage from './pages/CookiesPage';
 import TermsPage from './pages/TermsPage';
 import { useScrollHandler } from './hooks/useScrollHandler';
+import PageViewTracker from './components/common/PageViewTracker';
 
 function ScrollToTop() {
     const { pathname, search } = useLocation();
@@ -144,6 +145,7 @@ export default function App() {
     return (
         <Router>
             <ScrollToTop />
+            <PageViewTracker />
             <AppContent />
         </Router>
     );
