@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import 'lenis/dist/lenis.css';
 import AppLayout from './components/layout/AppLayout';
-import WhatsAppFloat from './components/common/WhatsAppFloat';
+import ContactFloat from './components/common/ContactFloat';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
@@ -15,7 +15,6 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import CookiesPage from './pages/CookiesPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
-import InternalErrorPage from './pages/InternalErrorPage';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { useScrollHandler } from './hooks/useScrollHandler';
 import PageViewTracker from './components/common/PageViewTracker';
@@ -102,7 +101,7 @@ function AppContent() {
 
     return (
         <div className="relative">
-            <WhatsAppFloat />
+            <ContactFloat />
             <AppLayout
                 showLoader={showLoader}
                 isDesktop={isDesktop}
