@@ -8,7 +8,6 @@ import { imgSize } from "../lib/imageOptimizer";
 
 const GallerySection = () => {
   const { data: images, isLoading } = useGallery();
-  const navigate = useNavigate();
   const headerRef = useFadeInView();
   const buttonRef = useFadeInView();
 
@@ -111,7 +110,7 @@ const GalleryExpand = ({
       className={cn("relative w-full px-0", className)}
     >
       <div className="w-full">
-        {/* Mobile Masonry Layout */}
+        {/* Mobile Masonry Layout — pure CSS transitions for performance */}
         <div className="flex flex-col gap-4 md:hidden px-2">
           <div
             className={cn(
@@ -157,7 +156,7 @@ const GalleryExpand = ({
         </div>
 
         {/* Desktop Expand on Hover Layout */}
-        <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3 py-4 lg:py-8">
+        <div className="hidden md:flex w-full items-center justify-center gap-2 md:gap-3">
           {items.map((image, index) => (
             <motion.div
               key={index}
