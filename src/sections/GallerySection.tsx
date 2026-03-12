@@ -44,26 +44,24 @@ const GallerySection = () => {
             <div className="w-8 h-8 border-2 border-white/10 border-t-[#D4AF37] rounded-full animate-spin" />
           </div>
         ) : galleryItems.length === 0 ? null : (
-          <>
-            <div className="w-full mb-12">
-              <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
-                <GalleryExpand items={galleryItems} />
-              </div>
+          <div className="w-full mb-12">
+            <div className="flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
+              <GalleryExpand items={galleryItems} />
             </div>
-
-            {/* View All button */}
-            <div ref={buttonRef} className="fade-in-view">
-              <Link
-                to="/gallery"
-                className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit inline-block"
-              >
-                <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                  View Full Gallery
-                </span>
-              </Link>
-            </div>
-          </>
+          </div>
         )}
+
+        {/* View All button — always rendered so fade-in-view works on first load */}
+        <div ref={buttonRef} className="fade-in-view">
+          <Link
+            to="/gallery"
+            className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit inline-block"
+          >
+            <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+              View Full Gallery
+            </span>
+          </Link>
+        </div>
       </div>
     </section>
   );
