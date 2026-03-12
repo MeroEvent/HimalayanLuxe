@@ -7,9 +7,6 @@ interface HeroSectionProps {
     setIsMuted: (muted: boolean) => void;
 }
 
-const FALLBACK_VIDEO = '/Video.mp4';
-const FALLBACK_TAGLINE = 'the most sought after nuptial artist in the world';
-
 export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
@@ -17,9 +14,14 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
     const { data: hero } = useActiveHero();
     const [mediaError, setMediaError] = useState(false);
 
-    const mediaUrl = (!mediaError && hero?.media_url) || FALLBACK_VIDEO;
-    const tagline = hero?.tagline || FALLBACK_TAGLINE;
-    const isVideo = mediaError ? true : (hero ? hero.media_type === 'video' : true);
+    // Don't render anything if no hero data
+    if (!hero) {
+        return null;
+    }
+
+    const mediaUrl = !mediaError ? hero.media_url : null;
+    const tagline = hero.tagline;
+    const isVideo = hero.media_type === 'video';
 
     // Lock height on mobile to prevent address bar resizing jumps
     useLayoutEffect(() => {
@@ -82,7 +84,12 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
         return () => {
             observer.disconnect();
         };
-    }, [isMuted]);
+    }, [isMuted, isVideo]);
+
+    // Don't render media if there's an error or no URL
+    if (!mediaUrl) {
+        return null;
+    }
 
     return (
         <section
@@ -101,12 +108,11 @@ export default function HeroSection({ isMuted, setIsMuted }: HeroSectionProps) {
                         playsInline
                         muted={isMuted}
                         className="w-full h-full object-cover"
-                        onError={() => setMediaError(true)}
                     >
-                        <source src={mediaUrl} type="video/mp4" onError={() => setMediaError(true)} />
+                        <source src={mediaUrl} type="video/mp4" />
                     </video>
                 ) : (
-                    <img key={mediaUrl} src={mediaUrl} alt="Hero" className="w-full h-full object-cover" onError={() => setMediaError(true)} />
+                    <img key={mediaUrl} src={mediaUrl} alt="Hero" className="w-full h-full object-cover" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/10 to-black/80"></div>
             </div>
