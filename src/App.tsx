@@ -94,7 +94,6 @@ function AppContent() {
                 return () => clearTimeout(timer);
             }
         } else {
-            hasShownLoader.current = false;
             setShowLoader(false);
         }
     }, [isHomePage]);

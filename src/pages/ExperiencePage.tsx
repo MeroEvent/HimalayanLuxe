@@ -13,21 +13,22 @@ export default function ExperiencePage() {
     return (
         <div className="relative min-h-screen pt-32 pb-0">
             {/* Hero Section - Kept consistent */}
-            <section className="relative w-full px-8 md:px-16 pt-20 pb-20 flex flex-col items-center justify-center min-h-[40vh]">
-                <div className="max-w-[1200px] mx-auto text-center relative z-10">
+            <section className="relative w-full px-8 md:px-16 py-10 flex flex-col items-center justify-center">
+                <div className="max-w-[1600px] mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        className="text-center mb-10"
                     >
-                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
+                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                             Our Philosophy
                         </span>
-                        <h1 className="font-serif text-white/95 text-[clamp(40px,5vw,80px)] leading-[1.1] font-normal tracking-tight mb-8">
-                            The Art of <span className="liquid-gold-text italic">Perfection</span>
+                        <h1 className="font-serif text-white/95 text-[clamp(28px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
+                            The Art of <span className="liquid-gold-text">Perfection</span>
                         </h1>
-                        <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed">
-                            Four pillars that define our relentless pursuit of the extraordinary.
+                        <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
+                            Four pillars that define our pursuit of the extraordinary
                         </p>
                     </motion.div>
                 </div>
