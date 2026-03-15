@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 
 interface ExperienceSectionProps {
@@ -12,7 +13,12 @@ export default function ExperienceSection({
     setActivePhilosophy, 
     activePhilosophyRef 
 }: ExperienceSectionProps) {
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    // Use DB data if available, fallback to hardcoded
+    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
 
     return (
         <section className="section-container relative min-h-[100dvh] py-12 md:py-24 w-full flex flex-col px-8 md:px-24 overflow-hidden" id="experience">
@@ -45,7 +51,7 @@ export default function ExperienceSection({
                     <div className="flex flex-col gap-8">
                         <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit">
                             <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                Discover The Art
+                                Explore Our Vision
                             </span>
                         </button>
 
@@ -119,8 +125,8 @@ export default function ExperienceSection({
                                 key={activePhilosophy}
                                 className="flex flex-col"
                             >
-                                <span className="text-[40px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
-                                <span className="text-[10px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
+                                <span className="text-[28px] font-serif text-gold/20 leading-none mb-2">0{activePhilosophy + 1}</span>
+                                <span className="text-[8px] tracking-[0.3em] uppercase text-white/40 font-medium">Philosophy</span>
                             </motion.div>
                         </div>
                     </div>

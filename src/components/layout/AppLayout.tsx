@@ -4,6 +4,7 @@ import Loader from '../ui/Loader';
 import Header from './Header';
 import NavigationOverlay from './NavigationOverlay';
 import Footer from './Footer';
+import OfflineBanner from '../common/OfflineBanner';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -24,7 +25,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
     return (
         <div className="relative min-h-screen">
-            <div className="fixed inset-0 z-0">
+            <div className="fixed inset-0 z-0 pointer-events-none">
                 <Silk
                     speed={0.8}
                     scale={0.8}
@@ -36,6 +37,8 @@ export default function AppLayout({
             </div>
 
             <Loader showLoader={showLoader} isDesktop={isDesktop} />
+
+            <OfflineBanner />
 
             <Header
                 isScrolled={isScrolled}

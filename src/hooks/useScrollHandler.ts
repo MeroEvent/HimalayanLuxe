@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { philosophiesData } from '../data/philosophies';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,10 +10,7 @@ interface UseScrollHandlerProps {
     isHomePage: boolean;
     setIsScrolled: (scrolled: boolean) => void;
     setActiveSection: (section: string) => void;
-    setActivePhilosophy: (index: number) => void;
-    activePhilosophy: number;
     activeSectionRef: React.MutableRefObject<string>;
-    activePhilosophyRef: React.MutableRefObject<number>;
 }
 
 export function useScrollHandler({
@@ -22,78 +18,119 @@ export function useScrollHandler({
     isHomePage,
     setIsScrolled,
     setActiveSection,
-    setActivePhilosophy,
-    activePhilosophy,
     activeSectionRef,
-    activePhilosophyRef
 }: UseScrollHandlerProps) {
     useEffect(() => {
         if (showLoader) return;
 
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-            infinite: false,
-        });
+        const isMobile = window.innerWidth < 1024;
 
-        // Sync Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update);
+        let lenis: Lenis | null = null;
+        let tick: ((time: number) => void) | null = null;
 
-        gsap.ticker.add((time) => {
-            lenis.raf(time * 1000);
-        });
-
-        gsap.ticker.lagSmoothing(0);
-
-        const handleScroll = () => {
-            const scrollY = window.scrollY;
-            setIsScrolled(scrollY > 100);
-
-            if (!isHomePage) return;
-
-            const heroSection = document.getElementById('hero');
-            if (heroSection) {
-                const heroHeight = heroSection.offsetHeight;
-                setIsScrolled(scrollY > heroHeight - 100);
-            }
-
-            const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
-            sections.forEach((sectionId) => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    const rect = element.getBoundingClientRect();
-                    if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-                        setActiveSection(sectionId);
-                        activeSectionRef.current = sectionId;
-                    }
-                }
+        if (!isMobile) {
+            lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: 'vertical',
+                gestureOrientation: 'vertical',
+                smoothWheel: true,
+                wheelMultiplier: 1,
+                touchMultiplier: 2,
+                infinite: false,
             });
-        };
 
-        lenis.on('scroll', handleScroll);
+            // Expose Lenis globally so ScrollToTop can reset scroll position
+            (window as any).__lenis = lenis;
 
-        function raf(time: number) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
+            lenis.on('scroll', ScrollTrigger.update);
+
+            tick = (time: number) => {
+                lenis?.raf(time * 1000);
+            };
+
+            gsap.ticker.add(tick);
+            gsap.ticker.lagSmoothing(0);
         }
 
-        const rafId = requestAnimationFrame(raf);
-        handleScroll();
+        // Cache hero height once — don't read it on every scroll
+        let cachedHeroHeight = 0;
+        const heroSection = document.getElementById('hero');
+        if (heroSection) {
+            cachedHeroHeight = heroSection.offsetHeight;
+        }
 
-        // Refresh ScrollTrigger to ensure all section positions are accurate
+        // Debounced scroll state — only update React state when the value actually changes
+        let lastIsScrolled = false;
+
+        function handleScroll() {
+            const scrollY = window.scrollY;
+            const threshold = isHomePage && cachedHeroHeight > 0
+                ? cachedHeroHeight - 100
+                : 100;
+            const nowScrolled = scrollY > threshold;
+
+            if (nowScrolled !== lastIsScrolled) {
+                lastIsScrolled = nowScrolled;
+                setIsScrolled(nowScrolled);
+            }
+        }
+
+        if (lenis) {
+            lenis.on('scroll', handleScroll);
+        } else {
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+
+        // Section tracking via IntersectionObserver (no scroll-loop reads)
+        const observers: IntersectionObserver[] = [];
+
+        if (isHomePage) {
+            const sectionIds = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        if (activeSectionRef.current !== id) {
+                            activeSectionRef.current = id;
+                            setActiveSection(id);
+                        }
+                    }
+                });
+            }, {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px',
+                threshold: 0.1
+            });
+
+            sectionIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) observer.observe(el);
+            });
+            observers.push(observer);
+        }
+
+        // Recache hero height on resize
+        const handleResize = () => {
+            if (heroSection) {
+                cachedHeroHeight = heroSection.offsetHeight;
+            }
+        };
+        window.addEventListener('resize', handleResize);
+
+        handleScroll();
         ScrollTrigger.refresh();
 
         return () => {
-            lenis.destroy();
-            cancelAnimationFrame(rafId);
-            gsap.ticker.remove((time) => {
-                lenis.raf(time * 1000);
-            });
+            if (lenis) {
+                lenis.destroy();
+                (window as any).__lenis = null;
+            }
+            if (tick) gsap.ticker.remove(tick);
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleResize);
+            observers.forEach(o => o.disconnect());
         };
-    }, [showLoader, activePhilosophy, isHomePage, setIsScrolled, setActiveSection, setActivePhilosophy, activeSectionRef, activePhilosophyRef]);
+    }, [showLoader, isHomePage, setIsScrolled, setActiveSection, activeSectionRef]);
 }

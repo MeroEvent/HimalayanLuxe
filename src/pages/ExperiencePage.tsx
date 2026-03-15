@@ -1,106 +1,94 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 import SimpleCTA from '../components/common/SimpleCTA';
 
 export default function ExperiencePage() {
-    const [activePhilosophy, setActivePhilosophy] = useState(0);
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    const philosophies = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map(p => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : philosophiesData.map(p => ({ title: p.title, heading: p.title, description: p.description, image: p.image }));
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
-            <section className="relative w-full px-8 md:px-16 py-20">
-                <div className="max-w-[1600px] mx-auto">
-                    {/* Header */}
+            {/* Hero Section - Kept consistent */}
+            <section className="relative w-full px-8 md:px-16 pt-10 pb-6 md:py-10 flex flex-col items-center justify-center">
+                <div className="max-w-[1600px] mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-center mb-20"
+                        className="text-center mb-2"
                     >
-                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
+                        <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-3 block">
                             Our Philosophy
                         </span>
-                        <h1 className="font-serif text-white/95 text-[clamp(32px,5vw,72px)] leading-[1.1] font-normal tracking-tight mb-8">
+                        <h1 className="font-serif text-white/95 text-[clamp(32px,4vw,56px)] leading-[1.1] font-normal tracking-tight mb-4">
                             The Art of <span className="liquid-gold-text">Perfection</span>
                         </h1>
-                        <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed">
-                            Four pillars that define our approach to creating unforgettable experiences
+                        <p className="text-white/50 text-sm max-w-xl mx-auto leading-relaxed">
+                            Four pillars that define our pursuit of the extraordinary
                         </p>
-                    </motion.div>
-
-                    {/* Philosophy Selector */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="flex justify-center gap-4 mb-16 flex-wrap"
-                    >
-                        {philosophies.map((phil, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setActivePhilosophy(index)}
-                                className={`px-6 py-3 rounded-full text-xs uppercase tracking-[0.2em] font-medium transition-all duration-500 ${activePhilosophy === index
-                                        ? 'bg-gold/20 border border-gold text-gold'
-                                        : 'border border-white/20 text-white/60 hover:border-gold/50 hover:text-gold'
-                                    }`}
-                            >
-                                {phil.title}
-                            </button>
-                        ))}
-                    </motion.div>
-
-                    {/* Philosophy Content */}
-                    <motion.div
-                        key={activePhilosophy}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="grid md:grid-cols-2 gap-12 items-center mb-20"
-                    >
-                        <div>
-                            <span className="liquid-gold-text text-xs tracking-[0.4em] uppercase font-medium mb-6 block">
-                                {philosophies[activePhilosophy].title}
-                            </span>
-                            <h2 className="font-serif text-white/95 text-4xl md:text-5xl mb-6 leading-[1.1]">
-                                {philosophies[activePhilosophy].heading}
-                            </h2>
-                            <p className="text-white/60 text-lg leading-relaxed">
-                                {philosophies[activePhilosophy].description}
-                            </p>
-                        </div>
-                        <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden glass-card p-3">
-                            <img
-                                src={philosophies[activePhilosophy].image}
-                                alt={philosophies[activePhilosophy].title}
-                                className="w-full h-full object-cover rounded-[28px]"
-                            />
-                        </div>
-                    </motion.div>
-
-                    {/* Additional Content */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 1 }}
-                        className="glass-card p-12 rounded-[32px] text-center"
-                    >
-                        <h3 className="font-serif text-white/95 text-3xl md:text-4xl mb-6">
-                            Experience the Difference
-                        </h3>
-                        <p className="text-white/60 text-lg max-w-3xl mx-auto leading-relaxed mb-8">
-                            Our philosophy isn't just words on a page—it's the foundation of every event we create.
-                            From the first consultation to the final farewell, these principles guide our every decision.
-                        </p>
-                        <button className="group relative overflow-hidden rounded-full border border-gold/30 px-8 py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10">
-                            <span className="relative z-10 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                Start Your Journey
-                            </span>
-                        </button>
                     </motion.div>
                 </div>
             </section>
+
+            {/* Philosophy Scroll Showcase */}
+            <div className="w-full px-6 md:px-12 lg:px-16 pb-32">
+                {philosophies.map((phil, index) => (
+                    <motion.section 
+                        key={index}
+                        initial={{ opacity: 0, y: 100 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="relative py-10 md:py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center"
+                    >
+                        {/* Media Column */}
+                        <div className={`lg:col-span-6 relative flex justify-center ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                            <div className={`relative aspect-[10/12] rounded-[32px] md:rounded-[48px] overflow-hidden group max-w-[85%] ${index % 2 === 0 ? 'lg:ml-auto lg:mr-0' : 'lg:mr-auto lg:ml-0'}`}>
+                                <motion.img 
+                                    initial={{ scale: 1.2 }}
+                                    whileInView={{ scale: 1 }}
+                                    transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                                    src={phil.image} 
+                                    alt={phil.title} 
+                                    className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#02140F]/80 via-transparent to-transparent opacity-60" />
+                            </div>
+                            
+                            {/* Decorative Label */}
+                            <div className={`absolute -bottom-6 ${index % 2 === 1 ? '-left-4' : '-right-4'} hidden md:block z-20`}>
+                                <div className="glass-card px-8 py-4 rounded-full border-white/10 backdrop-blur-xl">
+                                    <span className="liquid-gold-text text-[10px] tracking-[0.4em] uppercase font-bold">
+                                        PILLAR {index + 1}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content Column */}
+                        <div className={`lg:col-span-6 flex justify-center lg:block ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div className={`relative z-10 max-w-[85%] text-center lg:text-left ${index % 2 === 0 ? 'lg:mr-auto lg:ml-0' : 'lg:ml-auto lg:mr-0'}`}>
+                                <span className="liquid-gold-text text-[8px] tracking-[0.4em] uppercase font-bold mb-4 block">
+                                    {phil.title}
+                                </span>
+                                <h2 className="font-serif text-white text-[clamp(22px,3vw,42px)] leading-[1.1] mb-6">
+                                    {phil.heading}
+                                </h2>
+                                <p className="text-white/50 text-sm md:text-base leading-relaxed mb-8 font-light tracking-wide italic">
+                                    {phil.description}
+                                </p>
+                                
+                                <div className="w-24 h-[1px] bg-gold/30 mb-8 mx-auto lg:mx-0" />
+                            </div>
+                        </div>
+                    </motion.section>
+                ))}
+            </div>
+
             <SimpleCTA />
         </div>
     );

@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
+import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { imgSize } from '../lib/imageOptimizer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,16 +15,30 @@ interface ExperienceSectionStickyProps {
     activePhilosophyRef: React.MutableRefObject<number>;
 }
 
+interface PhilosophyDisplayItem {
+    title: string;
+    heading: string | React.ReactNode;
+    description: string;
+    image: string;
+}
+
 export default function ExperienceSectionSticky({
     activePhilosophy,
     setActivePhilosophy,
     activePhilosophyRef
 }: ExperienceSectionStickyProps) {
-    const philosophies = philosophiesData;
+    const { data: dbPhilosophies } = usePhilosophies();
+
+    const rawPhilosophies: PhilosophyDisplayItem[] = dbPhilosophies && dbPhilosophies.length > 0
+        ? dbPhilosophies.map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image_url }))
+        : (philosophiesData as any[]).map((p: any) => ({ title: p.title, heading: p.heading, description: p.description, image: p.image }));
+        
+    // Only show first 3 philosophies on homepage
+    const philosophies = rawPhilosophies.slice(0, 3);
     const sectionRef = useRef<HTMLElement>(null);
     const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
     const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
-    const [isDesktop, setIsDesktop] = useState(true);
+    const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
     const [isInteracting, setIsInteracting] = useState(false);
     const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +46,6 @@ export default function ExperienceSectionSticky({
         const checkMobile = () => {
             setIsDesktop(window.innerWidth >= 768);
         };
-        checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
@@ -60,15 +75,18 @@ export default function ExperienceSectionSticky({
             onUpdate: (self) => {
                 const progress = self.progress;
 
-                // Update active philosophy index
+                // Update active philosophy index — only update React state when it actually changes
                 const currentIndex = Math.min(
                     Math.floor(progress * totalPhilosophies),
                     totalPhilosophies - 1
                 );
 
                 if (currentIndex !== activePhilosophyRef.current) {
-                    setActivePhilosophy(currentIndex);
                     activePhilosophyRef.current = currentIndex;
+                    // Defer React state update to avoid blocking the scroll frame
+                    requestAnimationFrame(() => {
+                        setActivePhilosophy(currentIndex);
+                    });
                 }
 
                 // Animate content with smooth, continuous scrolling
@@ -191,7 +209,7 @@ export default function ExperienceSectionSticky({
 
     const isAnimatingRef = useRef(false);
 
-    // Auto-play logic for mobile carousel
+    // Auto-play logic for mobile carousel - optimized for performance
     useEffect(() => {
         if (isDesktop || isInteracting || !carouselRef.current) return;
 
@@ -202,30 +220,33 @@ export default function ExperienceSectionSticky({
             const nextIndex = (activePhilosophy + 1) % philosophies.length;
             const cardWidth = container.offsetWidth * 0.85;
             const gap = 24; // gap-6
+            const targetScroll = nextIndex * (cardWidth + gap);
 
             isAnimatingRef.current = true;
 
-            gsap.to(container, {
-                scrollLeft: nextIndex * (cardWidth + gap),
-                duration: 0.8,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    isAnimatingRef.current = false;
-                    setActivePhilosophy(nextIndex);
-                    activePhilosophyRef.current = nextIndex;
-                }
+            // Use native smooth scrolling instead of GSAP for better mobile performance
+            container.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
             });
+
+            // Update state after animation completes
+            setTimeout(() => {
+                isAnimatingRef.current = false;
+                setActivePhilosophy(nextIndex);
+                activePhilosophyRef.current = nextIndex;
+            }, 600); // Slightly less than scroll duration
+
         }, 3000);
 
         return () => {
             clearTimeout(timer);
-            gsap.killTweensOf(carouselRef.current);
         };
     }, [isDesktop, isInteracting, activePhilosophy, philosophies.length, setActivePhilosophy]);
 
     if (!isDesktop) {
         return (
-            <section className="relative w-full pt-24 pb-12 px-6 overflow-hidden bg-transparent" id="experience">
+            <section className="relative w-full py-16 md:py-[72px] px-6 md:px-12 overflow-hidden bg-transparent" id="experience">
                 <div className="flex flex-col items-center text-center gap-6 mb-12">
                     <span className="liquid-gold-text text-[10px] tracking-[0.3em] uppercase font-medium">Experience</span>
                     <h2 className="font-serif text-white/95 text-4xl leading-[1.1] font-normal tracking-tight mx-auto max-w-[280px]">The Art of <span className="italic text-white/50">Details</span></h2>
@@ -234,27 +255,35 @@ export default function ExperienceSectionSticky({
                 <div
                     ref={carouselRef}
                     className="flex overflow-x-auto gap-6 snap-x snap-proximity scrollbar-hide pb-8"
-                    style={{ WebkitOverflowScrolling: 'touch' }}
+                    style={{ 
+                        WebkitOverflowScrolling: 'touch',
+                        transform: 'translateZ(0)', // Force GPU acceleration
+                        willChange: 'scroll-position' // Optimize for scrolling
+                    }}
                     onMouseEnter={() => setIsInteracting(true)}
                     onMouseLeave={() => setIsInteracting(false)}
                     onTouchStart={() => setIsInteracting(true)}
                     onTouchEnd={() => setIsInteracting(false)}
                     onScroll={(e) => {
                         if (isAnimatingRef.current) return;
+                        
+                        // Throttle scroll events for better performance
                         const target = e.target as HTMLDivElement;
                         const cardWidth = target.offsetWidth * 0.85;
                         const gap = 24;
                         const index = Math.round(target.scrollLeft / (cardWidth + gap));
-                        if (index !== activePhilosophy) {
+                        
+                        // Only update if index actually changed
+                        if (index !== activePhilosophy && index >= 0 && index < philosophies.length) {
                             setActivePhilosophy(index);
                             activePhilosophyRef.current = index;
                         }
                     }}
                 >
-                    {philosophies.map((philosophy, index) => (
+                    {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                         <div key={index} className="flex-shrink-0 w-[85vw] snap-center flex flex-col gap-6">
                             <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden border border-gold/20 shadow-2xl p-1 bg-transparent">
-                                <img src={philosophy.image} alt={philosophy.title} className="w-full h-full object-cover rounded-[20px] brightness-105" />
+                                <img src={imgSize.philosophy(philosophy.image)} alt={philosophy.title} className="w-full h-full object-cover rounded-[20px] brightness-105" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
                                 <div className="absolute bottom-6 left-6">
                                     <span className="liquid-gold-text text-[10px] tracking-[0.2em] uppercase font-medium block mb-2">{philosophy.title}</span>
@@ -266,15 +295,21 @@ export default function ExperienceSectionSticky({
                                 <div className="flex items-center justify-between gap-4">
                                     <Link
                                         to="/experience"
-                                        className="group relative overflow-hidden rounded-full border border-gold/30 px-6 py-3 transition-all duration-700 hover:border-gold hover:bg-gold/10"
+                                        className="group relative overflow-hidden rounded-full border border-gold/30 px-7 py-3.5 transition-all duration-700 hover:border-gold/80 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]"
                                     >
-                                        <span className="relative z-10 text-[10px] font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                            Discover Now
+                                        <span className="absolute inset-0 bg-gradient-to-r from-gold/0 via-gold/10 to-gold/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                                        <span className="relative z-10 flex items-center gap-2.5">
+                                            <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                                Explore Our Vision
+                                            </span>
+                                            <svg className="w-3.5 h-3.5 text-gold transition-all duration-500 group-hover:text-white group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                            </svg>
                                         </span>
                                     </Link>
 
                                     <div className="flex gap-1.5 px-2">
-                                        {philosophies.map((_, i) => (
+                                        {philosophies.map((_: PhilosophyDisplayItem, i: number) => (
                                             <div
                                                 key={i}
                                                 className={`h-[1px] rounded-full transition-all duration-500 ${activePhilosophy === i ? 'w-6 bg-gold' : 'w-2 bg-white/20'}`}
@@ -297,19 +332,19 @@ export default function ExperienceSectionSticky({
             id="experience"
             style={{ height: `${philosophies.length * 100}vh` }}
         >
-            <div className="experience-sticky-content sticky top-0 left-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
+            <div className="experience-sticky-content w-full h-[100dvh] flex items-center justify-center overflow-hidden pt-[80px] md:pt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(800px,100vw)] h-[min(800px,100vw)] bg-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-8 px-6 md:px-32">
+                <div className="relative z-10 w-full max-w-[1400px] mx-auto flex-grow flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 md:gap-12 px-8 md:px-16 lg:px-20">
                     {/* Image Section - First on Mobile, Second on Desktop */}
                     <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center items-center">
                         <div className="relative w-full aspect-[4/3] md:h-[clamp(400px,60vh,700px)] max-w-2xl rounded-[16px] md:rounded-[32px] p-1 md:p-3 shadow-2xl border border-gold/20 bg-transparent flex-shrink-0">
                             <div className="relative w-full h-full rounded-[14px] md:rounded-[28px] overflow-hidden bg-transparent">
-                                {philosophies.map((philosophy, index) => (
+                                {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                                     <img
                                         key={index}
                                         ref={(el) => (imageRefs.current[index] = el)}
-                                        src={philosophy.image}
+                                        src={imgSize.philosophy(philosophy.image)}
                                         alt={philosophy.title}
                                         className="absolute inset-0 w-full h-full object-cover rounded-[14px] md:rounded-[28px] will-change-opacity brightness-105"
                                         style={{
@@ -324,7 +359,7 @@ export default function ExperienceSectionSticky({
                     {/* Content Section - Second on Mobile, First on Desktop */}
                     <div className="w-full md:w-1/2 order-2 md:order-1 flex flex-col items-start text-left justify-center relative">
                         <div className="relative w-full flex items-start justify-start overflow-hidden min-h-[400px] md:min-h-[60vh] pt-4 md:pt-0">
-                            {philosophies.map((philosophy, index) => (
+                            {philosophies.map((philosophy: PhilosophyDisplayItem, index: number) => (
                                 <div
                                     key={index}
                                     ref={(el) => (contentRefs.current[index] = el)}
@@ -344,15 +379,21 @@ export default function ExperienceSectionSticky({
                                     <div className="flex flex-col gap-6 md:gap-8">
                                         <Link
                                             to="/experience"
-                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-6 md:px-8 py-3 md:py-4 transition-all duration-700 hover:border-gold hover:bg-gold/10 w-fit"
+                                            className="group relative overflow-hidden rounded-full border border-gold/30 px-7 md:px-9 py-3.5 md:py-4 transition-all duration-700 hover:border-gold/80 hover:shadow-[0_0_20px_rgba(212,175,55,0.15)] w-fit"
                                         >
-                                            <span className="relative z-10 text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
-                                                Discover The Art
+                                            <span className="absolute inset-0 bg-gradient-to-r from-gold/0 via-gold/10 to-gold/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                                            <span className="relative z-10 flex items-center gap-2.5">
+                                                <span className="text-[10px] md:text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors duration-700 group-hover:text-white">
+                                                    Explore Our Vision
+                                                </span>
+                                                <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold transition-all duration-500 group-hover:text-white group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                </svg>
                                             </span>
                                         </Link>
 
                                         <div className="flex items-center gap-2.5 md:gap-3">
-                                            {philosophies.map((_, i) => (
+                                            {philosophies.map((_: PhilosophyDisplayItem, i: number) => (
                                                 <button
                                                     key={i}
                                                     onClick={() => scrollToPhilosophy(i)}

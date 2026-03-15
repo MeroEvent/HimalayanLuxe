@@ -2,25 +2,56 @@ import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import 'lenis/dist/lenis.css';
 import AppLayout from './components/layout/AppLayout';
-import SectionPagination from './components/common/SectionPagination';
+import ContactFloat from './components/common/ContactFloat';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ExperiencePage from './pages/ExperiencePage';
 import DestinationsPage from './pages/DestinationsPage';
-import PortfolioPage from './pages/PortfolioPage';
+import DestinationDetailPage from './pages/DestinationDetailPage';
+import GalleryPage from './pages/GalleryPage';
 import ServicesDetailPage from './pages/ServicesDetailPage';
 import ContactPage from './pages/ContactPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import CookiesPage from './pages/CookiesPage';
+import TermsPage from './pages/TermsPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { useScrollHandler } from './hooks/useScrollHandler';
+import PageViewTracker from './components/common/PageViewTracker';
 
 function ScrollToTop() {
-    const { pathname } = useLocation();
+    const { pathname, search } = useLocation();
 
     useEffect(() => {
+        // Disable browser's automatic scroll restoration to prevent flickering
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
+        // If Lenis smooth scroll is active, use it to scroll to top immediately
+        const lenis = (window as any).__lenis;
+        if (lenis) {
+            lenis.scrollTo(0, { immediate: true });
+        }
+
+        // Also reset native scroll for mobile / fallback
         window.scrollTo(0, 0);
-        // Also force scroll for any Lenis instance
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
-    }, [pathname]);
+
+        // Additional reset after a tiny delay to catch post-render adjustments
+        const timer = setTimeout(() => {
+            const lenisDelayed = (window as any).__lenis;
+            if (lenisDelayed) {
+                lenisDelayed.scrollTo(0, { immediate: true });
+            }
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 50);
+
+        return () => clearTimeout(timer);
+    }, [pathname, search]);
 
     return null;
 }
@@ -28,12 +59,10 @@ function ScrollToTop() {
 function AppContent() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    // Show loader on first mount only (not on route changes)
     const [showLoader, setShowLoader] = useState(true);
     const [isDesktop, setIsDesktop] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [activePhilosophy, setActivePhilosophy] = useState(0);
-    const [showActiveLabel, setShowActiveLabel] = useState(true);
 
     const activeSectionRef = useRef('hero');
     const activePhilosophyRef = useRef(0);
@@ -41,24 +70,20 @@ function AppContent() {
 
     const location = useLocation();
     const isHomePage = location.pathname === '/';
-    const sections = ['hero', 'experience', 'destinations', 'services', 'about', 'cta', 'footer'];
-
-    useEffect(() => {
-        setShowActiveLabel(true);
-        const timer = setTimeout(() => setShowActiveLabel(false), 3000);
-        return () => clearTimeout(timer);
-    }, [activeSection]);
 
     useScrollHandler({
         showLoader,
         isHomePage,
         setIsScrolled,
         setActiveSection,
-        setActivePhilosophy,
-        activePhilosophy,
         activeSectionRef,
-        activePhilosophyRef
     });
+
+    // Reset scroll state on route change — ScrollToTop scrolls to 0,
+    // so the nav should always start in the "not scrolled" state.
+    useEffect(() => {
+        setIsScrolled(false);
+    }, [location.pathname]);
 
     useEffect(() => {
         setIsDesktop(window.innerWidth >= 768);
@@ -79,33 +104,61 @@ function AppContent() {
                 return () => clearTimeout(timer);
             }
         } else {
-            // Reset loader tracker when leaving home so it shows again on next return
-            hasShownLoader.current = false;
             setShowLoader(false);
         }
     }, [isHomePage]);
 
-    const handleSectionClick = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            const navHeight = 0;
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - navHeight;
-
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-
-            setActiveSection(id);
-            activeSectionRef.current = id;
-
-            if (id === 'experience') {
-                setActivePhilosophy(0);
-                activePhilosophyRef.current = 0;
+    // Lock scroll when loader is showing or menu is open
+    useEffect(() => {
+        const shouldLockScroll = showLoader || menuOpen;
+        
+        if (shouldLockScroll) {
+            // Store current scroll position
+            const scrollY = window.scrollY;
+            
+            // Lock scroll
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.overflow = 'hidden';
+            
+            // Disable Lenis if it exists
+            const lenis = (window as any).__lenis;
+            if (lenis) {
+                lenis.stop();
+            }
+        } else {
+            // Unlock scroll
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
+            
+            // Restore scroll position
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
+            
+            // Re-enable Lenis if it exists
+            const lenis = (window as any).__lenis;
+            if (lenis) {
+                lenis.start();
             }
         }
-    };
+        
+        return () => {
+            // Cleanup on unmount
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
+        };
+    }, [showLoader, menuOpen]);
 
     return (
         <div className="relative">
+            <ContactFloat />
             <AppLayout
                 showLoader={showLoader}
                 isDesktop={isDesktop}
@@ -113,27 +166,35 @@ function AppContent() {
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
             >
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <HomePage
-                                activeSection={activeSection}
-                                setActiveSection={setActiveSection}
-                                activeSectionRef={activeSectionRef}
-                                activePhilosophy={activePhilosophy}
-                                setActivePhilosophy={setActivePhilosophy}
-                                activePhilosophyRef={activePhilosophyRef}
-                            />
-                        }
-                    />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/experience" element={<ExperiencePage />} />
-                    <Route path="/destinations" element={<DestinationsPage />} />
-                    <Route path="/portfolio" element={<PortfolioPage />} />
-                    <Route path="/services" element={<ServicesDetailPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                </Routes>
+                <ErrorBoundary>
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <HomePage
+                                    activeSection={activeSection}
+                                    setActiveSection={setActiveSection}
+                                    activeSectionRef={activeSectionRef}
+                                    activePhilosophy={activePhilosophy}
+                                    setActivePhilosophy={setActivePhilosophy}
+                                    activePhilosophyRef={activePhilosophyRef}
+                                    showLoader={showLoader}
+                                />
+                            }
+                        />
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route path="/experience" element={<ExperiencePage />} />
+                        <Route path="/destinations" element={<DestinationsPage />} />
+                        <Route path="/destinations/:id" element={<DestinationDetailPage />} />
+                        <Route path="/gallery" element={<GalleryPage />} />
+                        <Route path="/services" element={<ServicesDetailPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                        <Route path="/cookies" element={<CookiesPage />} />
+                        <Route path="/terms" element={<TermsPage />} />
+                        <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                </ErrorBoundary>
             </AppLayout>
         </div>
     );
@@ -143,6 +204,7 @@ export default function App() {
     return (
         <Router>
             <ScrollToTop />
+            <PageViewTracker />
             <AppContent />
         </Router>
     );
