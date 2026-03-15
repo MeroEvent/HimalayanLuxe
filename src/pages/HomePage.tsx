@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import HeroSection from '../sections/HeroSection';
 import ExperienceSectionSticky from '../sections/ExperienceSectionSticky';
 import DestinationsSection from '../sections/DestinationsSection';
@@ -58,6 +59,10 @@ export default function HomePage({
 
     return (
         <>
+            <Helmet>
+                <title>Himalayan Luxe | Luxury Event Planning in Nepal</title>
+                <meta name="description" content="Plan your dream luxury event in Nepal with Himalayan Luxe. Destination weddings, corporate events, and celebrations amidst breathtaking Himalayan landscapes." />
+            </Helmet>
             <HeroSection isMuted={isMuted} setIsMuted={setIsMuted} showLoader={showLoader} />
 
             <ExperienceSectionSticky

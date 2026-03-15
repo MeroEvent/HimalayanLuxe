@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { usePhilosophies } from '../hooks/usePhilosophies';
 import { philosophiesData } from '../data/philosophies';
 import SimpleCTA from '../components/common/SimpleCTA';
@@ -12,6 +13,10 @@ export default function ExperiencePage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
+            <Helmet>
+                <title>Experience | Himalayan Luxe</title>
+                <meta name="description" content="Discover the Himalayan Luxe experience. Our philosophy of crafting extraordinary luxury events in Nepal's most stunning locations." />
+            </Helmet>
             {/* Hero Section - Kept consistent */}
             <section className="relative w-full px-8 md:px-16 pt-10 pb-6 md:py-10 flex flex-col items-center justify-center">
                 <div className="max-w-[1600px] mx-auto text-center relative z-10">

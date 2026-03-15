@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { CustomSelect } from '../components/ui/CustomSelect';
 import { CustomDatePicker } from '../components/ui/CustomDatePicker';
 import { Instagram, Facebook, CheckCircle } from 'lucide-react';
@@ -97,6 +98,10 @@ export default function ContactPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-14">
+            <Helmet>
+                <title>Contact Us | Himalayan Luxe</title>
+                <meta name="description" content="Get in touch with Himalayan Luxe for luxury event planning in Nepal. Reach out for destination weddings, corporate events, and celebrations." />
+            </Helmet>
             <section className="relative w-full px-8 md:px-16 py-10">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
