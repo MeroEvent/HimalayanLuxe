@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import SimpleCTA from '../components/common/SimpleCTA';
 import { useGallery, GalleryImage } from '../hooks/useGallery';
 import { optimizeImageUrl } from '../lib/imageOptimizer';
@@ -143,6 +144,10 @@ export default function GalleryPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
+            <Helmet>
+                <title>Gallery | Himalayan Luxe</title>
+                <meta name="description" content="Browse our portfolio of luxury events in Nepal. See stunning photos from destination weddings, celebrations, and events by Himalayan Luxe." />
+            </Helmet>
             <section className="relative w-full px-4 md:px-8 py-10 z-10">
                 <div className="max-w-[1400px] mx-auto">
                     {/* Header */}

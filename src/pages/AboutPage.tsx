@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import SimpleCTA from '../components/common/SimpleCTA';
 import { Sparkles, Heart, Crown, Award } from 'lucide-react';
 import { useAboutContent, useAboutStats, useTeamMembers, type TeamMember, type AboutStat } from '../hooks/useAboutContent';
@@ -77,6 +78,10 @@ export default function AboutPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0 overflow-hidden">
+            <Helmet>
+                <title>About Us | Himalayan Luxe</title>
+                <meta name="description" content="Learn about Himalayan Luxe — Nepal's premier luxury event planning company. Our story, team, and commitment to crafting extraordinary celebrations." />
+            </Helmet>
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none -mr-40 -mt-20" />
 
             {/* Page Header */}

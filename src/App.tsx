@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import 'lenis/dist/lenis.css';
 import AppLayout from './components/layout/AppLayout';
 import ContactFloat from './components/common/ContactFloat';
@@ -202,10 +203,12 @@ function AppContent() {
 
 export default function App() {
     return (
-        <Router>
-            <ScrollToTop />
-            <PageViewTracker />
-            <AppContent />
-        </Router>
+        <HelmetProvider>
+            <Router>
+                <ScrollToTop />
+                <PageViewTracker />
+                <AppContent />
+            </Router>
+        </HelmetProvider>
     );
 }

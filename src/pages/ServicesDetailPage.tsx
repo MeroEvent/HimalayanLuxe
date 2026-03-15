@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import SimpleCTA from '../components/common/SimpleCTA';
 import { useServices } from '../hooks/useServices';
 
@@ -70,6 +71,10 @@ export default function ServicesDetailPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
+            <Helmet>
+                <title>Services | Himalayan Luxe</title>
+                <meta name="description" content="Premium event planning services by Himalayan Luxe. Destination weddings, corporate events, artist booking, and luxury celebrations in Nepal." />
+            </Helmet>
             <section className="relative w-full px-8 md:px-16 pt-10 pb-6 md:py-10 flex flex-col items-center justify-center">
                 <div className="max-w-[1600px] mx-auto text-center relative z-10">
                     <motion.div

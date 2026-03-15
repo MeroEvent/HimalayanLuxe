@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useDestinations } from '../hooks/useDestinations';
 import { imgSize } from '../lib/imageOptimizer';
 import { useFadeInView } from '../hooks/useFadeInView';
@@ -107,6 +108,10 @@ export default function DestinationsPage() {
 
     return (
         <div className="relative min-h-screen pt-32 pb-0">
+            <Helmet>
+                <title>Destinations | Himalayan Luxe</title>
+                <meta name="description" content="Explore luxury event destinations across Nepal. From Pokhara to Kathmandu, discover breathtaking venues for your dream celebration." />
+            </Helmet>
             <section className="relative w-full px-8 md:px-16 py-10 z-10">
                 <div className="max-w-[1600px] mx-auto">
                     {/* Header */}
