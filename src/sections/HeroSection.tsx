@@ -545,7 +545,7 @@ export default function HeroSection({ isMuted, setIsMuted, showLoader = false }:
                 </div>
             )}
 
-            <div className="absolute bottom-14 right-[clamp(1.5rem,4vw,3rem)] z-40 hidden md:flex items-center justify-center">
+            {isVideo && <div className="absolute bottom-14 right-[clamp(1.5rem,4vw,3rem)] z-40 hidden md:flex items-center justify-center">
                 <motion.button
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -593,11 +593,11 @@ export default function HeroSection({ isMuted, setIsMuted, showLoader = false }:
                         )}
                     </div>
                 </motion.button>
-            </div>
+            </div>}
 
             <div className="w-full px-[clamp(1.5rem,4vw,4rem)] pb-10 md:pb-14 pt-[120px] flex flex-col items-start justify-end z-20" style={{ height: fixedHeight }}>
                 {/* Mobile Sound Button */}
-                <div className="md:hidden mb-6">
+                {isVideo && <div className="md:hidden mb-6">
                     <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -672,7 +672,7 @@ export default function HeroSection({ isMuted, setIsMuted, showLoader = false }:
                             />
                         )}
                     </motion.button>
-                </div>
+                </div>}
 
                 <motion.h2
                     initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
